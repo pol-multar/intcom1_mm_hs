@@ -14,7 +14,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     public static final int FLOOR_HEIGHT = 50;
     private static final int UFO_X = BackgroundPane.MAP_WIDTH / 2;
     private static final int UFO_Y = BackgroundPane.MAP_HEIGHT / 3;
-    private static final int[] COWS_X = {BackgroundPane.MAP_WIDTH / 2, BackgroundPane.MAP_WIDTH / 3, 2*BackgroundPane.MAP_WIDTH / 3};
+    private static final int NB_COWS = 3;
     private static final int WIND_MAX_SPEED = 50;
     private static final int LASER_WIDTH = (int)(UfoPane.UFO_WIDTH/7.8);
     private static final int LASER_HEIGHT = UfoPane.UFO_HEIGHT;
@@ -32,8 +32,8 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         ufo = new Ufo(UFO_X, UFO_Y);
         ufo.addObserver(this);
         cows = new LinkedList<Cow>();
-        for(int x : COWS_X){
-            cows.add(new Cow(x));
+        for(int i=0; i<NB_COWS; i++){
+            cows.add(new Cow((int)(Math.random()*BackgroundPane.MAP_WIDTH)));
         }
         chrono = new Chrono();
         processWindSpeed();
@@ -107,7 +107,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         ufo.reset(UFO_X, UFO_Y);
 
         for (int i = 0; i < cows.size(); i++) {
-            cows.get(i).reset(COWS_X[i]);
+            cows.get(i).reset((int)(Math.random()*BackgroundPane.MAP_WIDTH));
         }
 
         processWindSpeed();
