@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.LinkedList;
@@ -12,9 +14,10 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     public static final int FLOOR_HEIGHT = 50;
     private static final int UFO_X = BackgroundPane.MAP_WIDTH / 2;
     private static final int UFO_Y = BackgroundPane.MAP_HEIGHT / 3;
-    private static final int[] COWS_X = {BackgroundPane.MAP_WIDTH / 2};
-    private static final int[] COWS_Y = {BackgroundPane.MAP_HEIGHT - FLOOR_HEIGHT};
+    private static final int[] COWS_X = {BackgroundPane.MAP_WIDTH / 2, BackgroundPane.MAP_WIDTH / 3, 2*BackgroundPane.MAP_WIDTH / 3};
     private static final int WIND_MAX_SPEED = 50;
+    private static final int LASER_WIDTH = (int)(UfoPane.UFO_WIDTH/7.8);
+    private static final int LASER_HEIGHT = UfoPane.UFO_HEIGHT;
 
     private Ufo ufo;
     private List<Cow> cows;
@@ -23,17 +26,19 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     private Chrono chrono;
     private Thread chronoThread;
     private Thread ufoThread;
+    private CowCatcherFrame frame;
 
     public GameEngine() {
         ufo = new Ufo(UFO_X, UFO_Y);
         ufo.addObserver(this);
         cows = new LinkedList<Cow>();
-        Cow cow1 = new Cow(COWS_X[0], COWS_Y[0]);
-        cows.add(cow1);
+        for(int x : COWS_X){
+            cows.add(new Cow(x));
+        }
         chrono = new Chrono();
         processWindSpeed();
 
-        new CowCatcherFrame(this);
+        frame = new CowCatcherFrame(this);
 
         ufoThread = new Thread(ufo);
         chronoThread = new Thread(chrono);
@@ -72,7 +77,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         }
     }
 
-    private void resetChrono(){
+    private void resetChrono() {
         chrono.stop();
         try {
             chronoThread.join();
@@ -85,7 +90,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         chronoThread.start();
     }
 
-    private void resetUfo(){
+    private void resetUfo() {
         ufo.stop();
         try {
             ufoThread.join();
@@ -98,10 +103,11 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     }
 
     public void reset() {
+        cowsCaptured = 0;
         ufo.reset(UFO_X, UFO_Y);
 
         for (int i = 0; i < cows.size(); i++) {
-            cows.get(i).reset(COWS_X[i], COWS_Y[i]);
+            cows.get(i).reset(COWS_X[i]);
         }
 
         processWindSpeed();
@@ -112,20 +118,61 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         notifyObservers();
     }
 
+    public void zapp(){
+        Rectangle rect = new Rectangle(ufo.getX()-LASER_WIDTH/2, ufo.getY(), LASER_WIDTH, LASER_HEIGHT);
+
+        for(Cow c : cows){
+            if(!c.isCaptured() && rect.contains(c.getX(), c.getY())){
+                c.zapp();
+                cowsCaptured++;
+                setChanged();
+                notifyObservers();
+            }
+        }
+
+        if(cowsCaptured >= getNbCows()){
+            win();
+        }
+    }
+
+    public void win(){
+        chrono.stop();
+        ufo.stop();
+        String str = "Bravo ! Vous avez capturé ";
+        if(getNbCows() == 1){
+            str+= "la vache en ";
+        }else{
+            str+="les "+getNbCows()+" vaches en ";
+        }
+        str+=chrono.getSec()+" seconde";
+        if(chrono.getSec() > 1){
+            str+="s";
+        }
+        str+=" !";
+        JOptionPane.showMessageDialog(frame, str);
+    }
+
+    public void lose(){
+        chrono.stop();
+        JOptionPane.showMessageDialog(frame, "Vous vous êtes crashé... (vaches capturées : "+cowsCaptured+"/"+getNbCows()+").");
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
-            ufo.startDownEngine();
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            ufo.startRightEngine();
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            ufo.startLeftEngine();
-        } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            ufo.setLaser(true);
+        if (!ufo.isCrashed() && !ufo.isStopped()) {
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                ufo.startDownEngine();
+            } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                ufo.startRightEngine();
+            } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                ufo.startLeftEngine();
+            } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                ufo.setLaser(true);
+            }
         }
     }
 
@@ -145,8 +192,11 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     @Override
     public void update(Observable o, Object arg) {
         Ufo tmp = (Ufo) o;
-        if(tmp.isCrashed()){
-            chrono.stop();
+        if (tmp.isCrashed()) {
+            lose();
+        }
+        if (tmp.isLaser()) {
+            zapp();
         }
     }
 }

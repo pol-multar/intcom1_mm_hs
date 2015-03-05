@@ -27,6 +27,7 @@ public class Ufo extends Observable implements Runnable {
         m_y = y;
         leftEngine = false;
         rightEngine = false;
+        downEngine = false;
         crashed = false;
         laser = false;
     }
@@ -34,6 +35,18 @@ public class Ufo extends Observable implements Runnable {
 
     public void stop(){
         stop = true;
+        speed=0;
+        leftEngine = false;
+        rightEngine = false;
+        downEngine = false;
+        laser = false;
+
+        setChanged();
+        notifyObservers();
+    }
+
+    public boolean isStopped(){
+        return stop;
     }
 
     public void start(){
@@ -77,8 +90,6 @@ public class Ufo extends Observable implements Runnable {
 
     public void setLaser(boolean b) {
         laser = b;
-        setChanged();
-        notifyObservers();
     }
 
     public void startLeftEngine() {
@@ -110,39 +121,57 @@ public class Ufo extends Observable implements Runnable {
         downEngine = false;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return BackgroundPane.MAP_HEIGHT - m_y - GameEngine.FLOOR_HEIGHT;
+    }
+
+    public void crash(){
+        crashed = true;
+        leftEngine = false;
+        rightEngine = false;
+        downEngine = false;
+        laser = false;
     }
 
     @Override
     public void run() {
         // TODO
         while (!crashed && !stop) {
+            speed = 0;
             m_y++;
             if (downEngine) {
+                speed++;
                 m_y -= 2;
                 fuelTank -= 0.001;
             }
             if (leftEngine) {
-                m_x += 1;
+                speed++;
+                m_x ++;
                 fuelTank -= 0.001;
             }
             if (rightEngine) {
-                m_x -= 1;
+                speed++;
+                m_x --;
+                fuelTank -= 0.001;
+            }
+            if(laser){
                 fuelTank -= 0.001;
             }
 
             if (getHeight() <= 0) {
-                crashed = true;
-                leftEngine = false;
-                rightEngine = false;
-                laser = false;
+                crash();
+            }
+            if(fuelTank <= 0){
+                leftEngine=false;
+                rightEngine=false;
+                downEngine=false;
+                laser=false;
             }
 
             setChanged();
             notifyObservers();
             try {
-                Thread.sleep(100);
+                Thread.sleep(25);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

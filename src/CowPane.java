@@ -13,6 +13,7 @@ public class CowPane extends JPanel implements Observer{
     private static final int COW_HEIGHT = 55;
     private static final Image COW_IMAGE = new ImageIcon(COW_PATH).getImage();
     private static final Image ZAPPED_COW_IMAGE = new ImageIcon(ZAPPED_COW_PATH).getImage();
+    private static final int TIME_BEFORE_FADE = 500;
     private Cow cow;
 
     public CowPane(Cow cow){
@@ -26,8 +27,19 @@ public class CowPane extends JPanel implements Observer{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(cow.isZapped()){
+        if(cow.isCaptured()){
             g.drawImage(ZAPPED_COW_IMAGE, 0, 0, COW_WIDTH, COW_HEIGHT, this);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(TIME_BEFORE_FADE);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    CowPane.this.setVisible(false);
+                }
+            }).start();
         }else{
             g.drawImage(COW_IMAGE, 0, 0, COW_WIDTH, COW_HEIGHT, this);
         }
@@ -46,7 +58,10 @@ public class CowPane extends JPanel implements Observer{
     @Override
     public void update(Observable o, Object arg) {
         cow = (Cow)o;
-        setBounds(cow.getX()-COW_WIDTH/2, cow.getY()-COW_HEIGHT/2, COW_WIDTH, COW_HEIGHT);
+        setBounds(cow.getX() - COW_WIDTH / 2, cow.getY() - COW_HEIGHT / 2, COW_WIDTH, COW_HEIGHT);
+        if(!cow.isCaptured() && !isVisible()){
+            setVisible(true);
+        }
         repaint();
     }
 }

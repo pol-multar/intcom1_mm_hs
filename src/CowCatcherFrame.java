@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,6 +20,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private static final String ICON_CHRONO_PATH = "res/icon_chrono.png";
     private static final String RESET_BUTTON = "Remettre à 0";
     private static final String AUTO_BUTTON = "Pilote automatique";
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
     private static final int ICON_SIZE = 60;
     private static final int FRAME_WIDTH = 1067;
     private static final int FRAME_HEIGHT = 734;
@@ -31,9 +33,11 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private JProgressBar fuelBar;
     private GameEngine engine;
     private int windSpeed;
+    private LaserPane laserPane;
 
     public CowCatcherFrame(GameEngine e) {
         this.engine = e;
+        NUMBER_FORMAT.setMaximumFractionDigits(1);
 
         engine.getUfo().addObserver(this);
         engine.addObserver(this);
@@ -84,11 +88,13 @@ public class CowCatcherFrame extends JFrame implements Observer {
         backgroundPane.setLayout(new FlowLayout());
         backgroundPane.setLayout(null);
 
-        UfoPane ufoPane = new UfoPane(engine.getUfo());
-        backgroundPane.add(ufoPane);
+        backgroundPane.add(new UfoPane(engine.getUfo()));
+        laserPane = new LaserPane(engine.getUfo());
+        backgroundPane.add(laserPane);
 
-        CowPane cowPane = new CowPane(engine.getCow(0));
-        backgroundPane.add(cowPane);
+        for(int i=0; i<engine.getNbCows(); i++) {
+            backgroundPane.add(new CowPane(engine.getCow(i)));
+        }
 
         resetButton.addActionListener(new ActionListener() {
             @Override
@@ -103,7 +109,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
     }
 
     private void fillUfoLabels() {
-        heightLabel.setText(engine.getUfo().getHeight()+" px");
+        heightLabel.setText(NUMBER_FORMAT.format(engine.getUfo().getHeight())+" m");
         speedLabel.setText(engine.getUfo().getSpeed()+" km/h");
         fuelBar.setValue((int)(engine.getUfo().getFuelTank()*100));
     }
@@ -132,13 +138,22 @@ public class CowCatcherFrame extends JFrame implements Observer {
                 windLabel.setText(windSpeed + " km/h");
             }
         }
-        cowsLabel.setText(engine.getCowsCaptured() + "/" + engine.getNbCows()+ " cow(s)");
+        String str = engine.getCowsCaptured() + "/" + engine.getNbCows()+ " vache";
+        if(engine.getNbCows()>1){
+            str+="s";
+        }
+        cowsLabel.setText(str);
     }
 
     @Override
     public void update(Observable o, Object arg) {
         if(o instanceof Ufo){
+            Ufo tmp = (Ufo) o;
             fillUfoLabels();
+            if(tmp.isLaser() != laserPane.isFiring()){
+                laserPane.setFire(tmp.isLaser());
+            }
+            laserPane.setFire(((Ufo)o).isLaser());
         }else if(o instanceof Chrono){
             fillChronoLabel(((Chrono) o).getSec());
         }else{

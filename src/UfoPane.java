@@ -11,14 +11,12 @@ public class UfoPane extends JPanel implements Observer{
     private static final String UFO_CRASHED_PATH = "res/UFO_crashed.png";
     private static final String LEFT_ENGINE_PATH = "res/left_flame.png";
     private static final String RIGHT_ENGINE_PATH = "res/right_flame.png";
-    private static final String LASER_PATH = "res/laser.png";
-    private static final int UFO_WIDTH = 100;
-    private static final int UFO_HEIGHT = 100;
+    public static final int UFO_WIDTH = 120;
+    public static final int UFO_HEIGHT = 120;
     private static final Image UFO_IMAGE = new ImageIcon(UFO_PATH).getImage();
     private static final Image UFO_CRASHED_IMAGE = new ImageIcon(UFO_CRASHED_PATH).getImage();
     private static final Image LEFT_ENGINE_IMAGE = new ImageIcon(LEFT_ENGINE_PATH).getImage();
     private static final Image RIGHT_ENGINE_IMAGE = new ImageIcon(RIGHT_ENGINE_PATH).getImage();
-    private static final Image LASER_IMAGE = new ImageIcon(LASER_PATH).getImage();
     private Ufo ufo;
 
     public UfoPane(Ufo ufo){
@@ -32,9 +30,6 @@ public class UfoPane extends JPanel implements Observer{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(ufo.isLaser()){
-            g.drawImage(LASER_IMAGE, 0, 0, UFO_WIDTH, UFO_HEIGHT, this);
-        }
         if(!ufo.isCrashed()) {
             g.drawImage(UFO_IMAGE, 0, 0, UFO_WIDTH, UFO_HEIGHT, this);
         }else{
@@ -62,6 +57,5 @@ public class UfoPane extends JPanel implements Observer{
     public void update(Observable o, Object arg) {
         ufo = (Ufo)o;
         setBounds(ufo.getX()-UFO_WIDTH/2, ufo.getY()-UFO_HEIGHT/2, UFO_WIDTH, UFO_HEIGHT);
-        repaint();
     }
 }
