@@ -1,8 +1,8 @@
 /**
- * Created by Hugo on 03/03/2015.
+ * The launcher of the application
  */
 public class Launcher {
     public static void main(String[] args){
-        new CowCatcherFrame();
+        new GameEngine();
     }
 }
