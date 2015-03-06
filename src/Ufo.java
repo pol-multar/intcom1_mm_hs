@@ -5,7 +5,7 @@ import java.util.Observable;
  */
 public class Ufo extends Observable implements Runnable {
     private static final int Te = 25; // period
-    private static final int THRUST = 50; // engines thrust (kg*m/s^2)
+    private static final int THRUST = 25; // engines thrust (kg*m/s^2)
     private static final double FUEL_CONSUMPTION = 0.001;
     private static final int MASS = 6000; // mass (kg)
     private static final int FUEL_MASS = 800; // fuel mass (kg)
@@ -105,7 +105,7 @@ public class Ufo extends Observable implements Runnable {
                 fuelTank -= FUEL_CONSUMPTION;
             }
 
-            double erg = SPECIFIC_I / (double) (MASS + FUEL_MASS * fuelTank);
+            double erg = SPECIFIC_I / (MASS + FUEL_MASS * fuelTank);
             taY = erg * comY;
             taX = erg * comX;
             aY = taY - context.getG();
