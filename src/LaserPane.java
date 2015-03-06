@@ -1,10 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * The laser panel
  */
-public class LaserPane extends JPanel {
+public class LaserPane extends JPanel implements Observer {
     private static final String LASER_PATH = "res/laser.png";
     private static final int LASER_WIDTH = UfoPane.UFO_WIDTH;
     private static final int LASER_HEIGHT = UfoPane.UFO_HEIGHT;
@@ -14,6 +16,7 @@ public class LaserPane extends JPanel {
 
     public LaserPane(Ufo ufo) {
         this.ufo = ufo;
+        ufo.addObserver(this);
         setPreferredSize(new Dimension(LASER_WIDTH, LASER_HEIGHT));
         setOpaque(false);
         setBounds(ufo.getX() - LASER_WIDTH / 2, ufo.getY(), LASER_WIDTH, LASER_HEIGHT);
@@ -25,6 +28,14 @@ public class LaserPane extends JPanel {
         if (isFiring) {
             g.drawImage(LASER_IMAGE, 0, 0, LASER_WIDTH, LASER_HEIGHT, this);
         }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (((Ufo) o).isLaser() != isFiring()) {
+            setFire(((Ufo) o).isLaser());
+        }
+        setFire(((Ufo) o).isLaser());
     }
 
     // Getters & Setters

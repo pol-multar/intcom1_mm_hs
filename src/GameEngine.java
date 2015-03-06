@@ -182,6 +182,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
                 ufo.setLaser(true);
             }
         }
+        if (e.getKeyCode() == KeyEvent.VK_R) {
+            reset();
+        }
     }
 
     @Override

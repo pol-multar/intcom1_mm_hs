@@ -20,8 +20,8 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private static final String ICON_FUEL_PATH = "res/icon_fuel.png";
     private static final String ICON_CHRONO_PATH = "res/icon_chrono.png";
     // The buttons labels
-    private static final String RESET_BUTTON = "Rejouer";
-    private static final String AUTO_BUTTON = "Pilote automatique";
+    private static final String RESET_BUTTON = "Rejouer (R)";
+    private static final String AUTO_BUTTON = "Pilote automatique (A)";
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(); // The number format (for the height)
     private static final int ICON_SIZE = 60; // The size of the icons
 
@@ -33,7 +33,6 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private JProgressBar fuelBar;
     private GameEngine engine;
     private int windSpeed;
-    private LaserPane laserPane;
 
     public CowCatcherFrame(int width, int height, int mapWidth, int mapHeight, GameEngine e) {
         this.engine = e;
@@ -93,8 +92,10 @@ public class CowCatcherFrame extends JFrame implements Observer {
 
         // Fill the main pane
         backgroundPane.add(new UfoPane(engine.getUfo()));
-        laserPane = new LaserPane(engine.getUfo());
+        LaserPane laserPane = new LaserPane(engine.getUfo());
+        ArrowPane arrowPane = new ArrowPane(engine.getUfo(), backgroundPane);
         backgroundPane.add(laserPane);
+        backgroundPane.add(arrowPane);
         for (int i = 0; i < engine.getNbCows(); i++) {
             backgroundPane.add(new CowPane(engine.getCow(i)));
         }
@@ -164,12 +165,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof Ufo) {
-            Ufo tmp = (Ufo) o;
             fillUfoLabels();
-            if (tmp.isLaser() != laserPane.isFiring()) {
-                laserPane.setFire(tmp.isLaser());
-            }
-            laserPane.setFire(((Ufo) o).isLaser());
         } else if (o instanceof Chrono) {
             fillChronoLabel(((Chrono) o).getSec());
         } else {

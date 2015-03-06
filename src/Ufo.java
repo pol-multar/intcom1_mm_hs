@@ -71,6 +71,8 @@ public class Ufo extends Observable implements Runnable {
      */
     public void crash() {
         crashed = true;
+        vX = 0;
+        vY = 0;
         leftEngine = false;
         rightEngine = false;
         downEngine = false;
