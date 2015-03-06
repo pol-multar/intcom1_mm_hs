@@ -4,10 +4,21 @@ import java.util.Observable;
  * The UFO !
  */
 public class Ufo extends Observable implements Runnable {
+    private static final int Te = 25; // period
+    private static final int THRUST = 50; // engines thrust (kg*m/s^2)
+    private static final double FUEL_CONSUMPTION = 0.001;
+    private static final int MASS = 6000; // mass (kg)
+    private static final int FUEL_MASS = 800; // fuel mass (kg)
+    private static final int SPECIFIC_I = 4500; // specific impulse (m/s)
+    private static final int LASER_WIDTH = (int) (UfoPane.UFO_WIDTH / 7.8); // The laser hitbox width
+    private static final int LASER_HEIGHT = UfoPane.UFO_HEIGHT; // The laser hitbox height
+
+    private GameEngine context;
     private double fuelTank = 1.;
-    private int speed;
-    private int m_x;
-    private int m_y;
+    private double vX;
+    private double vY;
+    private double m_x;
+    private double m_y;
     private boolean leftEngine;
     private boolean rightEngine;
     private boolean downEngine;
@@ -15,16 +26,23 @@ public class Ufo extends Observable implements Runnable {
     private boolean stop;
     private boolean laser;
 
-    public Ufo(int x, int y) {
-        m_x = x;
-        m_y = y;
+    public Ufo(GameEngine context, int x, int y) {
+        this.context = context;
+        reset(x, y);
     }
 
-    public void reset(int x, int y){
+    /**
+     * Resets the ufo
+     *
+     * @param x the x position
+     * @param y the y position
+     */
+    public void reset(int x, int y) {
         fuelTank = 1.;
-        speed=0;
+        vX = 0;
+        vY = 0;
         m_x = x;
-        m_y = y;
+        m_y = context.getMapHeight() - y;
         leftEngine = false;
         rightEngine = false;
         downEngine = false;
@@ -32,10 +50,13 @@ public class Ufo extends Observable implements Runnable {
         laser = false;
     }
 
-
-    public void stop(){
+    /**
+     * Stops the ufo
+     */
+    public void stop() {
         stop = true;
-        speed=0;
+        vX = 0;
+        vY = 0;
         leftEngine = false;
         rightEngine = false;
         downEngine = false;
@@ -45,11 +66,94 @@ public class Ufo extends Observable implements Runnable {
         notifyObservers();
     }
 
-    public boolean isStopped(){
+    /**
+     * Crashes the ufo
+     */
+    public void crash() {
+        crashed = true;
+        leftEngine = false;
+        rightEngine = false;
+        downEngine = false;
+        laser = false;
+    }
+
+    /**
+     * Processes the movements of the ufo
+     */
+    @Override
+    public void run() {
+        while (!crashed && !stop) {
+            double dt = Te / 1000.;
+            double aY, taY, aX, taX;
+            int comX = 0, comY = 0;
+
+            if (downEngine) {
+                comY += THRUST;
+                fuelTank -= FUEL_CONSUMPTION;
+            }
+            if (leftEngine) {
+                comX += THRUST;
+                fuelTank -= FUEL_CONSUMPTION;
+            }
+            if (rightEngine) {
+                comX -= THRUST;
+                fuelTank -= FUEL_CONSUMPTION;
+            }
+            if (laser) {
+                fuelTank -= FUEL_CONSUMPTION;
+            }
+
+            double erg = SPECIFIC_I / (double) (MASS + FUEL_MASS * fuelTank);
+            taY = erg * comY;
+            taX = erg * comX;
+            aY = taY - context.getG();
+            aX = taX + context.getWindSpeed();
+            m_x = (m_x / context.getPxMRatio() + dt * vX + (0.5) * dt * dt * aX) * context.getPxMRatio();
+            m_y = (m_y / context.getPxMRatio() + dt * vY + (0.5) * dt * dt * aY) * context.getPxMRatio();
+            vX = vX + aX * dt;
+            vY = vY + aY * dt;
+
+            if (getHeight() <= 0) {
+                m_y = context.getFloorHeight();
+                crash();
+            }
+
+            if (fuelTank <= 0) {
+                leftEngine = false;
+                rightEngine = false;
+                downEngine = false;
+                laser = false;
+            }
+
+            setChanged();
+            notifyObservers();
+            try {
+                Thread.sleep(Te);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Getters & Setters
+
+    public double getHeight() {
+        return (m_y - context.getFloorHeight()) / context.getPxMRatio();
+    }
+
+    public int getLaserHeight() {
+        return LASER_HEIGHT;
+    }
+
+    public int getLaserWidth() {
+        return LASER_WIDTH;
+    }
+
+    public boolean isStopped() {
         return stop;
     }
 
-    public void start(){
+    public void start() {
         stop = false;
     }
 
@@ -62,20 +166,21 @@ public class Ufo extends Observable implements Runnable {
     }
 
     public int getSpeed() {
-        return speed;
+        return (int) Math.sqrt(vX * vX + vY * vY);
     }
 
     public int getX() {
-        return m_x;
+        return (int) m_x;
     }
 
     public int getY() {
-        return m_y;
+        return (int) (context.getMapHeight() - m_y);
     }
 
     public boolean isLeftEngine() {
         return leftEngine;
     }
+
     public boolean isDownEngine() {
         return downEngine;
     }
@@ -117,64 +222,8 @@ public class Ufo extends Observable implements Runnable {
     public void stopRightEngine() {
         rightEngine = false;
     }
+
     public void stopDownEngine() {
         downEngine = false;
-    }
-
-    public double getHeight() {
-        return BackgroundPane.MAP_HEIGHT - m_y - GameEngine.FLOOR_HEIGHT;
-    }
-
-    public void crash(){
-        crashed = true;
-        leftEngine = false;
-        rightEngine = false;
-        downEngine = false;
-        laser = false;
-    }
-
-    @Override
-    public void run() {
-        // TODO
-        while (!crashed && !stop) {
-            speed = 0;
-            m_y++;
-            if (downEngine) {
-                speed++;
-                m_y -= 2;
-                fuelTank -= 0.001;
-            }
-            if (leftEngine) {
-                speed++;
-                m_x ++;
-                fuelTank -= 0.001;
-            }
-            if (rightEngine) {
-                speed++;
-                m_x --;
-                fuelTank -= 0.001;
-            }
-            if(laser){
-                fuelTank -= 0.001;
-            }
-
-            if (getHeight() <= 0) {
-                crash();
-            }
-            if(fuelTank <= 0){
-                leftEngine=false;
-                rightEngine=false;
-                downEngine=false;
-                laser=false;
-            }
-
-            setChanged();
-            notifyObservers();
-            try {
-                Thread.sleep(25);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

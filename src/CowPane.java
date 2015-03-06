@@ -6,7 +6,7 @@ import java.util.Observer;
 /**
  * The cow pane
  */
-public class CowPane extends JPanel implements Observer{
+public class CowPane extends JPanel implements Observer {
     private static final String COW_PATH = "res/cow.png";
     private static final String ZAPPED_COW_PATH = "res/cow_zapped.png";
     private static final int COW_WIDTH = 100;
@@ -16,7 +16,7 @@ public class CowPane extends JPanel implements Observer{
     private static final int TIME_BEFORE_FADE = 500;
     private Cow cow;
 
-    public CowPane(Cow cow){
+    public CowPane(Cow cow) {
         this.cow = cow;
         cow.addObserver(this);
         setPreferredSize(new Dimension(COW_WIDTH, COW_HEIGHT));
@@ -27,7 +27,7 @@ public class CowPane extends JPanel implements Observer{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(cow.isCaptured()){
+        if (cow.isCaptured()) {
             g.drawImage(ZAPPED_COW_IMAGE, 0, 0, COW_WIDTH, COW_HEIGHT, this);
             new Thread(new Runnable() {
                 @Override
@@ -40,28 +40,30 @@ public class CowPane extends JPanel implements Observer{
                     CowPane.this.setVisible(false);
                 }
             }).start();
-        }else{
+        } else {
             g.drawImage(COW_IMAGE, 0, 0, COW_WIDTH, COW_HEIGHT, this);
         }
     }
 
     @Override
-    public int getWidth(){
+    public void update(Observable o, Object arg) {
+        cow = (Cow) o;
+        setBounds(cow.getX() - COW_WIDTH / 2, cow.getY() - COW_HEIGHT / 2, COW_WIDTH, COW_HEIGHT);
+        if (!cow.isCaptured() && !isVisible()) {
+            setVisible(true);
+        }
+        repaint();
+    }
+
+    // Getters & Setters
+
+    @Override
+    public int getWidth() {
         return COW_WIDTH;
     }
 
     @Override
-    public int getHeight(){
+    public int getHeight() {
         return COW_HEIGHT;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        cow = (Cow)o;
-        setBounds(cow.getX() - COW_WIDTH / 2, cow.getY() - COW_HEIGHT / 2, COW_WIDTH, COW_HEIGHT);
-        if(!cow.isCaptured() && !isVisible()){
-            setVisible(true);
-        }
-        repaint();
     }
 }

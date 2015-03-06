@@ -6,26 +6,30 @@ import java.awt.*;
  */
 public class BackgroundPane extends JPanel {
     private static final String BACKGROUND_PATH = "res/background.png";
-    public static final int MAP_WIDTH = 1067;
-    public static final int MAP_HEIGHT = 600;
+    private int width;
+    private int height;
 
-    public BackgroundPane(){
-        setPreferredSize(new Dimension(MAP_WIDTH, MAP_HEIGHT));
+    public BackgroundPane(int width, int height) {
+        this.width = width;
+        this.height = height;
+        setPreferredSize(new Dimension(width, height));
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(new ImageIcon(BACKGROUND_PATH).getImage(), 0, 0, MAP_WIDTH, MAP_HEIGHT, this);
+        g.drawImage(new ImageIcon(BACKGROUND_PATH).getImage(), 0, 0, width, height, this);
+    }
+
+    // Getters & Setters
+
+    @Override
+    public int getWidth() {
+        return width;
     }
 
     @Override
-    public int getWidth(){
-        return MAP_WIDTH;
-    }
-
-    @Override
-    public int getHeight(){
-        return MAP_HEIGHT;
+    public int getHeight() {
+        return height;
     }
 }

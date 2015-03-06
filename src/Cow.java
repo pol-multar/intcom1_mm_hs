@@ -3,22 +3,33 @@ import java.util.Observable;
 /**
  * The cow
  */
-public class Cow extends Observable{
+public class Cow extends Observable {
     public boolean captured;
     private int m_x;
+    private int m_y;
 
-    public Cow(int x) {
+    public Cow(int x, int y) {
+        reset(x, y);
+    }
+
+    /**
+     * Reset the cow
+     *
+     * @param x the x location
+     * @param y the y location
+     */
+    public void reset(int x, int y) {
         m_x = x;
-    }
-
-    public boolean isCaptured(){
-        return captured;
-    }
-
-    public void zapp(){
-        captured = true;
+        m_y = y;
+        captured = false;
         setChanged();
         notifyObservers();
+    }
+
+    // Getters & Setters
+
+    public boolean isCaptured() {
+        return captured;
     }
 
     public int getX() {
@@ -26,12 +37,11 @@ public class Cow extends Observable{
     }
 
     public int getY() {
-        return BackgroundPane.MAP_HEIGHT - GameEngine.FLOOR_HEIGHT;
+        return m_y;
     }
 
-    public void reset(int x) {
-        m_x = x;
-        captured = false;
+    public void zapp() {
+        captured = true;
         setChanged();
         notifyObservers();
     }

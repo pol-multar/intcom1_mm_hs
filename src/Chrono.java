@@ -7,24 +7,17 @@ public class Chrono extends Observable implements Runnable {
     private int sec = -1;
     private boolean stop;
 
-    public void stop(){
-        stop = true;
-    }
-    public void start(){
-        stop = false;
-    }
-
-    public void reset(){
+    /**
+     * Resets the chrono
+     */
+    public void reset() {
         sec = -1;
     }
 
-    public int getSec(){
-        return sec;
-    }
 
     @Override
     public void run() {
-        while(!stop) {
+        while (!stop) {
             try {
                 sec++;
                 setChanged();
@@ -34,5 +27,19 @@ public class Chrono extends Observable implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    // Getters & Setters
+
+    public int getSec() {
+        return sec;
+    }
+
+    public void stop() {
+        stop = true;
+    }
+
+    public void start() {
+        stop = false;
     }
 }

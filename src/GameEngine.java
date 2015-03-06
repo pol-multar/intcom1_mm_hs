@@ -11,65 +11,55 @@ import java.util.Observer;
  * The core of the project.
  */
 public class GameEngine extends Observable implements KeyListener, Observer {
-    public static final int FLOOR_HEIGHT = 50;
-    private static final int UFO_X = BackgroundPane.MAP_WIDTH / 2;
-    private static final int UFO_Y = BackgroundPane.MAP_HEIGHT / 3;
-    private static final int NB_COWS = 3;
-    private static final int WIND_MAX_SPEED = 50;
-    private static final int LASER_WIDTH = (int)(UfoPane.UFO_WIDTH/7.8);
-    private static final int LASER_HEIGHT = UfoPane.UFO_HEIGHT;
+    private static final int FRAME_WIDTH = 1067; // The window width
+    private static final int FRAME_HEIGHT = 734; // The window height
+    private static final int MAP_WIDTH = FRAME_WIDTH; // The game pane width
+    private static final int MAP_HEIGHT = (int) (FRAME_HEIGHT / 1.2234); // The game pane height
+    private static final int FLOOR_HEIGHT = 50; // The height of the floor (px)
+    private static final int UFO_X = MAP_WIDTH / 2; // The init x location of the ufo
+    private static final int UFO_Y = MAP_HEIGHT / 3; // The init y location of the ufo
+    private static final int NB_COWS = 5; // The number of cows
+    private static final int WIND_MAX_SPEED = 10; // The maximum speed of wind (m/s)
+    private static final double G = 9.807; // The gravity (m/s^2)
+    private static final double PX_M_RATIO = 42.3; // The ratio pixel/meter
+    private static final int COW_HITBOX_SIZE = 30; // The hitbox of the cows
 
-    private Ufo ufo;
-    private List<Cow> cows;
-    private int windSpeed;
-    private int cowsCaptured;
-    private Chrono chrono;
-    private Thread chronoThread;
-    private Thread ufoThread;
-    private CowCatcherFrame frame;
+    private Ufo ufo; // The ufo
+    private List<Cow> cows; // The cows
+    private int windSpeed; // The speed of the wind
+    private int nbCowsCaptured; // The number of cows captured
+    private Chrono chrono; // The chrono runnable
+    private Thread chronoThread; // The thread of the chrono
+    private Thread ufoThread; // The thread of the ufo
+    private CowCatcherFrame frame; // The main view
 
     public GameEngine() {
-        ufo = new Ufo(UFO_X, UFO_Y);
+        // Init the ufo
+        ufo = new Ufo(this, UFO_X, UFO_Y);
         ufo.addObserver(this);
+        // Init the cows
         cows = new LinkedList<Cow>();
-        for(int i=0; i<NB_COWS; i++){
-            cows.add(new Cow((int)(Math.random()*BackgroundPane.MAP_WIDTH)));
+        for (int i = 0; i < NB_COWS; i++) {
+            cows.add(new Cow((int) (Math.random() * MAP_WIDTH), MAP_HEIGHT - FLOOR_HEIGHT));
         }
+        // Init the chrono
         chrono = new Chrono();
+        // Init the wind
         processWindSpeed();
 
-        frame = new CowCatcherFrame(this);
+        // Init the view
+        frame = new CowCatcherFrame(FRAME_WIDTH, FRAME_HEIGHT, MAP_WIDTH, MAP_HEIGHT, this);
 
+        // Start the threads
         ufoThread = new Thread(ufo);
         chronoThread = new Thread(chrono);
         ufoThread.start();
         chronoThread.start();
     }
 
-    public Ufo getUfo() {
-        return ufo;
-    }
-
-    public Cow getCow(int i) {
-        return cows.get(i);
-    }
-
-    public int getNbCows() {
-        return cows.size();
-    }
-
-    public int getWindSpeed() {
-        return windSpeed;
-    }
-
-    public Chrono getChrono() {
-        return chrono;
-    }
-
-    public int getCowsCaptured() {
-        return cowsCaptured;
-    }
-
+    /**
+     * Processes the speed of the wind (random)
+     */
     private void processWindSpeed() {
         windSpeed = (int) (Math.random() * WIND_MAX_SPEED);
         if (Math.random() < 0.5) {
@@ -77,6 +67,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         }
     }
 
+    /**
+     * Restarts the chrono thread
+     */
     private void resetChrono() {
         chrono.stop();
         try {
@@ -90,6 +83,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         chronoThread.start();
     }
 
+    /**
+     * Restarts the ufo thread
+     */
     private void resetUfo() {
         ufo.stop();
         try {
@@ -102,12 +98,15 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         ufoThread.start();
     }
 
+    /**
+     * Restarts the game
+     */
     public void reset() {
-        cowsCaptured = 0;
+        nbCowsCaptured = 0;
         ufo.reset(UFO_X, UFO_Y);
 
-        for (int i = 0; i < cows.size(); i++) {
-            cows.get(i).reset((int)(Math.random()*BackgroundPane.MAP_WIDTH));
+        for (Cow c : cows) {
+            c.reset((int) (Math.random() * MAP_WIDTH), MAP_HEIGHT - FLOOR_HEIGHT);
         }
 
         processWindSpeed();
@@ -118,43 +117,52 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         notifyObservers();
     }
 
-    public void zapp(){
-        Rectangle rect = new Rectangle(ufo.getX()-LASER_WIDTH/2, ufo.getY(), LASER_WIDTH, LASER_HEIGHT);
+    /**
+     * The ufo is firing his laser, zapp the cows touched by the laser !
+     */
+    public void zapp() {
+        Rectangle rect = new Rectangle(ufo.getX() - ufo.getLaserWidth() / 2, ufo.getY(), ufo.getLaserWidth(), ufo.getLaserHeight());
 
-        for(Cow c : cows){
-            if(!c.isCaptured() && rect.contains(c.getX(), c.getY())){
+        for (Cow c : cows) {
+            if (!c.isCaptured() && rect.intersects(new Rectangle(c.getX() - COW_HITBOX_SIZE / 2, c.getY() - COW_HITBOX_SIZE / 2, COW_HITBOX_SIZE, COW_HITBOX_SIZE))) {
                 c.zapp();
-                cowsCaptured++;
+                nbCowsCaptured++;
                 setChanged();
                 notifyObservers();
             }
         }
 
-        if(cowsCaptured >= getNbCows()){
+        if (nbCowsCaptured >= getNbCows()) {
             win();
         }
     }
 
-    public void win(){
+    /**
+     * The victory message
+     */
+    public void win() {
         chrono.stop();
         ufo.stop();
         String str = "Bravo ! Vous avez capturé ";
-        if(getNbCows() == 1){
-            str+= "la vache en ";
-        }else{
-            str+="les "+getNbCows()+" vaches en ";
+        if (getNbCows() == 1) {
+            str += "la vache en ";
+        } else {
+            str += "les " + getNbCows() + " vaches en ";
         }
-        str+=chrono.getSec()+" seconde";
-        if(chrono.getSec() > 1){
-            str+="s";
+        str += chrono.getSec() + " seconde";
+        if (chrono.getSec() > 1) {
+            str += "s";
         }
-        str+=" !";
-        JOptionPane.showMessageDialog(frame, str);
+        str += " !";
+        JOptionPane.showMessageDialog(frame, str, "Gagné !", JOptionPane.PLAIN_MESSAGE);
     }
 
-    public void lose(){
+    /**
+     * The loss message
+     */
+    public void lose() {
         chrono.stop();
-        JOptionPane.showMessageDialog(frame, "Vous vous êtes crashé... (vaches capturées : "+cowsCaptured+"/"+getNbCows()+").");
+        JOptionPane.showMessageDialog(frame, "Vous vous êtes crashé... (vaches capturées : " + nbCowsCaptured + "/" + getNbCows() + ").", "Perdu !", JOptionPane.PLAIN_MESSAGE);
     }
 
     @Override
@@ -198,5 +206,47 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         if (tmp.isLaser()) {
             zapp();
         }
+    }
+
+    // Getters & Setters
+
+    public Ufo getUfo() {
+        return ufo;
+    }
+
+    public Cow getCow(int i) {
+        return cows.get(i);
+    }
+
+    public int getNbCows() {
+        return cows.size();
+    }
+
+    public int getWindSpeed() {
+        return windSpeed;
+    }
+
+    public double getPxMRatio() {
+        return PX_M_RATIO;
+    }
+
+    public double getG() {
+        return G;
+    }
+
+    public Chrono getChrono() {
+        return chrono;
+    }
+
+    public int getMapHeight() {
+        return MAP_HEIGHT;
+    }
+
+    public int getNbCowsCaptured() {
+        return nbCowsCaptured;
+    }
+
+    public int getFloorHeight() {
+        return FLOOR_HEIGHT;
     }
 }

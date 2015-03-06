@@ -12,7 +12,7 @@ public class LaserPane extends JPanel {
     private Ufo ufo;
     private boolean isFiring;
 
-    public LaserPane(Ufo ufo){
+    public LaserPane(Ufo ufo) {
         this.ufo = ufo;
         setPreferredSize(new Dimension(LASER_WIDTH, LASER_HEIGHT));
         setOpaque(false);
@@ -22,30 +22,32 @@ public class LaserPane extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(isFiring){
+        if (isFiring) {
             g.drawImage(LASER_IMAGE, 0, 0, LASER_WIDTH, LASER_HEIGHT, this);
         }
     }
 
+    // Getters & Setters
+
     @Override
-    public int getWidth(){
+    public int getWidth() {
         return LASER_WIDTH;
     }
 
     @Override
-    public int getHeight(){
+    public int getHeight() {
         return LASER_HEIGHT;
     }
 
     public void setFire(boolean b) {
         isFiring = b;
-        if(b){
+        if (b) {
             setBounds(ufo.getX() - LASER_WIDTH / 2, ufo.getY(), LASER_WIDTH, LASER_HEIGHT);
         }
         repaint();
     }
 
-    public boolean isFiring(){
+    public boolean isFiring() {
         return isFiring;
     }
 }
