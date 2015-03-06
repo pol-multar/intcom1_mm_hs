@@ -47,13 +47,13 @@ public class ArrowPane extends JLabel implements Observer {
     public void update(Observable o, Object arg) {
         if (ufo.getY() < 0) {
             display(ufo.getX(), 0, ArrowState.UP);
-            setText("" + ufo.getY() * -1);
+            setText((int) ((ufo.getY() * -1) / GameEngine.PX_M_RATIO) + " m");
         } else if (ufo.getX() < 0) {
             display(0, ufo.getY(), ArrowState.LEFT);
-            setText("" + ufo.getX() * -1);
+            setText((int) ((ufo.getX() * -1) / GameEngine.PX_M_RATIO) + " m");
         } else if (ufo.getX() > context.getWidth()) {
             display(context.getWidth() - ARROW_SIZE, ufo.getY(), ArrowState.RIGHT);
-            setText("" + (ufo.getX() - context.getWidth()));
+            setText((int) ((ufo.getX() - context.getWidth()) / GameEngine.PX_M_RATIO) + " m");
         } else {
             hideArrow();
             setText("");

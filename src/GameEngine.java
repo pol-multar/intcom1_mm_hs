@@ -11,6 +11,7 @@ import java.util.Observer;
  * The core of the project.
  */
 public class GameEngine extends Observable implements KeyListener, Observer {
+    public static final double PX_M_RATIO = 42.3; // The ratio pixel/meter
     private static final int FRAME_WIDTH = 1067; // The window width
     private static final int FRAME_HEIGHT = 734; // The window height
     private static final int MAP_WIDTH = FRAME_WIDTH; // The game pane width
@@ -21,7 +22,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     private static final int NB_COWS = 5; // The number of cows
     private static final int WIND_MAX_SPEED = 10; // The maximum speed of wind (m/s)
     private static final double G = 9.807; // The gravity (m/s^2)
-    private static final double PX_M_RATIO = 42.3; // The ratio pixel/meter
     private static final int COW_HITBOX_SIZE = 30; // The hitbox of the cows
 
     private Ufo ufo; // The ufo
@@ -80,7 +80,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         chrono.reset();
         chrono.start();
         chronoThread = new Thread(chrono);
-        chronoThread.start();
     }
 
     /**
@@ -95,7 +94,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         }
         ufo.start();
         ufoThread = new Thread(ufo);
-        ufoThread.start();
     }
 
     /**
@@ -103,7 +101,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
      */
     public void reset() {
         nbCowsCaptured = 0;
-        ufo.reset(UFO_X, UFO_Y);
 
         for (Cow c : cows) {
             c.reset((int) (Math.random() * MAP_WIDTH), MAP_HEIGHT - FLOOR_HEIGHT);
@@ -112,9 +109,13 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         processWindSpeed();
         resetChrono();
         resetUfo();
+        ufo.reset(UFO_X, UFO_Y);
 
         setChanged();
         notifyObservers();
+
+        ufoThread.start();
+        chronoThread.start();
     }
 
     /**
@@ -227,10 +228,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
 
     public int getWindSpeed() {
         return windSpeed;
-    }
-
-    public double getPxMRatio() {
-        return PX_M_RATIO;
     }
 
     public double getG() {

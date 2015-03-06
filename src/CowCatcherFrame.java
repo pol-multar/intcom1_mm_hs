@@ -32,7 +32,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private JLabel chronoLabel;
     private JProgressBar fuelBar;
     private GameEngine engine;
-    private int windSpeed;
+    private int windSpeed = -1;
 
     public CowCatcherFrame(int width, int height, int mapWidth, int mapHeight, GameEngine e) {
         this.engine = e;

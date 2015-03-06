@@ -110,8 +110,8 @@ public class Ufo extends Observable implements Runnable {
             taX = erg * comX;
             aY = taY - context.getG();
             aX = taX + context.getWindSpeed();
-            m_x = (m_x / context.getPxMRatio() + dt * vX + (0.5) * dt * dt * aX) * context.getPxMRatio();
-            m_y = (m_y / context.getPxMRatio() + dt * vY + (0.5) * dt * dt * aY) * context.getPxMRatio();
+            m_x = (m_x / GameEngine.PX_M_RATIO + dt * vX + (0.5) * dt * dt * aX) * GameEngine.PX_M_RATIO;
+            m_y = (m_y / GameEngine.PX_M_RATIO + dt * vY + (0.5) * dt * dt * aY) * GameEngine.PX_M_RATIO;
             vX = vX + aX * dt;
             vY = vY + aY * dt;
 
@@ -135,12 +135,14 @@ public class Ufo extends Observable implements Runnable {
                 e.printStackTrace();
             }
         }
+
+        System.out.println("lol");
     }
 
     // Getters & Setters
 
     public double getHeight() {
-        return (m_y - context.getFloorHeight()) / context.getPxMRatio();
+        return (m_y - context.getFloorHeight()) / GameEngine.PX_M_RATIO;
     }
 
     public int getLaserHeight() {
