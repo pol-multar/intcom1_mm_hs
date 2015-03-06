@@ -108,9 +108,6 @@ public class CowCatcherFrame extends JFrame implements Observer {
             }
         });
 
-        // The key listener (for the commands)
-        addKeyListener(engine);
-
         setVisible(true);
     }
 

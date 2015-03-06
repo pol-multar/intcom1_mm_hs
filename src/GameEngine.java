@@ -50,6 +50,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         // Init the view
         frame = new CowCatcherFrame(FRAME_WIDTH, FRAME_HEIGHT, MAP_WIDTH, MAP_HEIGHT, this);
 
+        // The key listener (for the commands)
+        frame.addKeyListener(this);
+
         // Start the threads
         ufoThread = new Thread(ufo);
         chronoThread = new Thread(chrono);
@@ -86,11 +89,14 @@ public class GameEngine extends Observable implements KeyListener, Observer {
      * Restarts the ufo thread
      */
     private void resetUfo() {
-        ufo.stop();
-        try {
-            ufoThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        ufo.reset(UFO_X, UFO_Y);
+        if (!ufo.isCrashed()) {
+            ufo.stop();
+            try {
+                ufoThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         ufo.start();
         ufoThread = new Thread(ufo);
@@ -109,7 +115,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         processWindSpeed();
         resetChrono();
         resetUfo();
-        ufo.reset(UFO_X, UFO_Y);
 
         setChanged();
         notifyObservers();
@@ -183,9 +188,6 @@ public class GameEngine extends Observable implements KeyListener, Observer {
                 ufo.setLaser(true);
             }
         }
-        if (e.getKeyCode() == KeyEvent.VK_R) {
-            reset();
-        }
     }
 
     @Override
@@ -198,6 +200,8 @@ public class GameEngine extends Observable implements KeyListener, Observer {
             ufo.stopLeftEngine();
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             ufo.setLaser(false);
+        } else if (e.getKeyCode() == KeyEvent.VK_R) {
+            reset();
         }
     }
 

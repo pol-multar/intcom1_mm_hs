@@ -71,12 +71,7 @@ public class Ufo extends Observable implements Runnable {
      */
     public void crash() {
         crashed = true;
-        vX = 0;
-        vY = 0;
-        leftEngine = false;
-        rightEngine = false;
-        downEngine = false;
-        laser = false;
+        stop();
     }
 
     /**
@@ -84,7 +79,7 @@ public class Ufo extends Observable implements Runnable {
      */
     @Override
     public void run() {
-        while (!crashed && !stop) {
+        while (!stop) {
             double dt = Te / 1000.;
             double aY, taY, aX, taX;
             int comX = 0, comY = 0;
@@ -118,6 +113,7 @@ public class Ufo extends Observable implements Runnable {
             if (getHeight() <= 0) {
                 m_y = context.getFloorHeight();
                 crash();
+                break;
             }
 
             if (fuelTank <= 0) {
@@ -135,8 +131,6 @@ public class Ufo extends Observable implements Runnable {
                 e.printStackTrace();
             }
         }
-
-        System.out.println("lol");
     }
 
     // Getters & Setters
