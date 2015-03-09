@@ -168,11 +168,11 @@ public class Ufo extends Observable implements Runnable {
     }
 
     public int getX() {
-        return (int) m_x;
+        return (int) Math.round(m_x);
     }
 
     public int getY() {
-        return (int) (context.getMapHeight() - m_y);
+        return (int) Math.round(context.getMapHeight() - m_y);
     }
 
     public boolean isLeftEngine() {

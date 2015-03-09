@@ -64,7 +64,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
      * Processes the speed of the wind (random)
      */
     private void processWindSpeed() {
-        windSpeed = (int) (Math.random() * WIND_MAX_SPEED);
+        windSpeed = (int)Math.round(Math.random() * WIND_MAX_SPEED);
         if (Math.random() < 0.5) {
             windSpeed *= -1;
         }
@@ -113,8 +113,8 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         }
 
         processWindSpeed();
-        resetChrono();
         resetUfo();
+        resetChrono();
 
         setChanged();
         notifyObservers();
