@@ -19,7 +19,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     private static final int FLOOR_HEIGHT = 50; // The height of the floor (px)
     private static final int UFO_X = MAP_WIDTH / 2; // The init x location of the ufo
     private static final int UFO_Y = MAP_HEIGHT / 3; // The init y location of the ufo
-    private static final int NB_COWS = 5; // The number of cows
+    private static final int NB_COWS = 10; // The number of cows
     private static final int WIND_MAX_SPEED = 10; // The maximum speed of wind (m/s)
     private static final double G = 9.807; // The gravity (m/s^2)
     private static final int COW_HITBOX_SIZE = 30; // The hitbox of the cows
@@ -40,7 +40,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         // Init the cows
         cows = new LinkedList<Cow>();
         for (int i = 0; i < NB_COWS; i++) {
-            cows.add(new Cow((int) (Math.random() * MAP_WIDTH), MAP_HEIGHT - FLOOR_HEIGHT));
+            cows.add(new Cow((int) Math.round(Math.random() * MAP_WIDTH), MAP_HEIGHT - FLOOR_HEIGHT));
         }
         // Init the chrono
         chrono = new Chrono();

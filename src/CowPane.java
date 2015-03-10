@@ -14,7 +14,9 @@ public class CowPane extends JPanel implements Observer {
     private static final Image COW_IMAGE = new ImageIcon(COW_PATH).getImage();
     private static final Image ZAPPED_COW_IMAGE = new ImageIcon(ZAPPED_COW_PATH).getImage();
     private static final int TIME_BEFORE_FADE = 500;
+    private static final double FADE_PERCENTAGE = 0.9;
     private Cow cow;
+    private float opacity = 1f;
 
     public CowPane(Cow cow) {
         this.cow = cow;
@@ -28,6 +30,8 @@ public class CowPane extends JPanel implements Observer {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (cow.isCaptured()) {
+            opacity*=FADE_PERCENTAGE;
+            ((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, opacity));
             g.drawImage(ZAPPED_COW_IMAGE, 0, 0, COW_WIDTH, COW_HEIGHT, this);
             new Thread(new Runnable() {
                 @Override
@@ -38,6 +42,7 @@ public class CowPane extends JPanel implements Observer {
                         e.printStackTrace();
                     }
                     CowPane.this.setVisible(false);
+                    opacity=1f;
                 }
             }).start();
         } else {
