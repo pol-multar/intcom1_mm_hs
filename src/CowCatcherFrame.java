@@ -65,7 +65,6 @@ public class CowCatcherFrame extends JFrame implements Observer {
         cowsLabel = new JLabel("", new ImageIcon(new ImageIcon(ICON_COW_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)), JLabel.LEFT);
         infoPane.add(cowsLabel);
         JButton autoButton = new JButton(AUTO_BUTTON);
-        autoButton.setEnabled(false);
         autoButton.setFocusable(false);
         infoPane.add(autoButton);
         windLabel = new JLabel("", new ImageIcon(new ImageIcon(ICON_WIND_LEFT_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)), JLabel.LEFT);
@@ -107,6 +106,12 @@ public class CowCatcherFrame extends JFrame implements Observer {
                 engine.reset();
             }
         });
+        autoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                engine.automatic();
+            }
+        });
 
         setVisible(true);
     }
@@ -146,10 +151,10 @@ public class CowCatcherFrame extends JFrame implements Observer {
             windSpeed = engine.getWindSpeed();
             if (engine.getWindSpeed() <= 0) {
                 windLabel.setIcon(new ImageIcon(new ImageIcon(ICON_WIND_LEFT_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)));
-                windLabel.setText(windSpeed * (-1) + " m/s");
+                windLabel.setText(windSpeed * (-1) + " m/s²");
             } else {
                 windLabel.setIcon(new ImageIcon(new ImageIcon(ICON_WIND_RIGHT_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)));
-                windLabel.setText(windSpeed + " m/s");
+                windLabel.setText(windSpeed + " m/s²");
             }
         }
         String str = engine.getNbCowsCaptured() + "/" + engine.getNbCows() + " vache";
