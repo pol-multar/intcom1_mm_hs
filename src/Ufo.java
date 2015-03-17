@@ -4,7 +4,7 @@ import java.util.Observable;
  * The UFO !
  */
 public class Ufo extends Observable implements Runnable {
-    private static final int Te = 25; // period
+    private static final int Te = 40; // period
     private static final int THRUST = 25; // engines thrust (kg*m/s^2)
     private static final double FUEL_CONSUMPTION = 0.001;
     private static final int MASS = 6000; // mass (kg)
@@ -25,6 +25,7 @@ public class Ufo extends Observable implements Runnable {
     private boolean crashed;
     private boolean stop;
     private boolean laser;
+    private boolean auto;
 
     public Ufo(GameEngine context, int x, int y) {
         this.context = context;
@@ -43,10 +44,16 @@ public class Ufo extends Observable implements Runnable {
         vY = 0;
         m_x = x;
         m_y = context.getMapHeight() - y;
+        crashed = false;
+        auto = false;
+
+        shutDownAll();
+    }
+
+    private void shutDownAll() {
         leftEngine = false;
         rightEngine = false;
         downEngine = false;
-        crashed = false;
         laser = false;
     }
 
@@ -57,10 +64,7 @@ public class Ufo extends Observable implements Runnable {
         stop = true;
         vX = 0;
         vY = 0;
-        leftEngine = false;
-        rightEngine = false;
-        downEngine = false;
-        laser = false;
+        shutDownAll();
 
         setChanged();
         notifyObservers();
@@ -83,6 +87,42 @@ public class Ufo extends Observable implements Runnable {
             double dt = Te / 1000.;
             double aY, taY, aX, taX;
             int comX = 0, comY = 0;
+
+            Cow c = null;
+            for(int i=0; i<context.getNbCows(); i++){
+                if(!context.getCow(i).isCaptured()){
+                    c = context.getCow(i);
+                }
+            }
+            if(c==null){
+                return;
+            }
+
+            if (auto) {
+                shutDownAll();
+                if(c.getX() < m_x){
+                    leftEngine = false;
+                    rightEngine=true;
+                } else if(c.getX() > m_x){
+                    leftEngine=true;
+                    rightEngine=false;
+                }
+
+                if(m_y < 300){
+                    downEngine=true;
+                    laser = true;
+                } else {
+                    downEngine=false;
+                    laser=false;
+                }
+            }
+
+            if (fuelTank <= 0) {
+                leftEngine = false;
+                rightEngine = false;
+                downEngine = false;
+                laser = false;
+            }
 
             if (downEngine) {
                 comY += THRUST;
@@ -114,13 +154,6 @@ public class Ufo extends Observable implements Runnable {
                 m_y = context.getFloorHeight();
                 crash();
                 break;
-            }
-
-            if (fuelTank <= 0) {
-                leftEngine = false;
-                rightEngine = false;
-                downEngine = false;
-                laser = false;
             }
 
             setChanged();
@@ -192,23 +225,25 @@ public class Ufo extends Observable implements Runnable {
     }
 
     public void setLaser(boolean b) {
-        laser = b;
+        if (fuelTank > 0 && !auto) {
+            laser = b;
+        }
     }
 
     public void startLeftEngine() {
-        if (fuelTank > 0) {
+        if (fuelTank > 0 && !auto) {
             leftEngine = true;
         }
     }
 
     public void startRightEngine() {
-        if (fuelTank > 0) {
+        if (fuelTank > 0 && !auto) {
             rightEngine = true;
         }
     }
 
     public void startDownEngine() {
-        if (fuelTank > 0) {
+        if (fuelTank > 0 && !auto) {
             downEngine = true;
         }
     }
@@ -223,5 +258,10 @@ public class Ufo extends Observable implements Runnable {
 
     public void stopDownEngine() {
         downEngine = false;
+    }
+
+    public void setAuto(boolean b) {
+        auto = b;
+        shutDownAll();
     }
 }

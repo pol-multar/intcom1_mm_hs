@@ -128,7 +128,7 @@ public class GameEngine extends Observable implements KeyListener, Observer {
      */
     public void automatic() {
         reset();
-        // TODO
+        ufo.setAuto(true);
     }
 
     /**
