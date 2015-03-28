@@ -128,6 +128,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
      */
     public void automatic() {
         reset();
+        windSpeed = 0;
+        setChanged();
+        notifyObservers();
         ufo.setAuto(true);
     }
 
@@ -262,5 +265,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
 
     public int getFloorHeight() {
         return FLOOR_HEIGHT;
+    }
+
+    public static int getCowHitboxSize() {
+        return COW_HITBOX_SIZE;
     }
 }
