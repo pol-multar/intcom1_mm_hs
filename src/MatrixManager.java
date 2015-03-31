@@ -27,7 +27,7 @@ public class MatrixManager {
         }
         for (int i=0; i<l; i++){
             for(int j=0; j<c; j++){
-                matrix[i][j] = Double.parseDouble(split[i+j]);
+                matrix[i][j] = Double.parseDouble(split[i*c+j]);
             }
         }
 

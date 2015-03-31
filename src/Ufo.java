@@ -7,7 +7,7 @@ import java.util.Observable;
 public class Ufo extends Observable implements Runnable {
     private static final int Te = 40; // period
     private static final int THRUST = 25; // engines thrust (kg*m/s^2)
-    private static final double FUEL_CONSUMPTION = 0.001;
+    private static final double FUEL_CONSUMPTION = 0.0005;
     private static final int MASS = 6000; // mass (kg)
     private static final int FUEL_MASS = 800; // fuel mass (kg)
     private static final int SPECIFIC_I = 4500; // specific impulse (m/s)
@@ -48,7 +48,6 @@ public class Ufo extends Observable implements Runnable {
         m_x = x;
         m_y = context.getMapHeight() - y;
         crashed = false;
-        auto = false;
 
         shutDownAll();
     }
@@ -102,40 +101,45 @@ public class Ufo extends Observable implements Runnable {
                 if (c == null) {
                     return;
                 }
-                /*double[][] positionSUBpositionTarget = {{m_x - c.getX()}, {0 - c.getX()}, {m_y - (context.getMapHeight() - c.getY() - LASER_HEIGHT/2.)}, {0 - (context.getMapHeight() - c.getY() - LASER_HEIGHT)}};
-                double[][] un = MatrixManager.multMatrix(kre, positionSUBpositionTarget);
-                System.out.println(MatrixManager.matrixToString(un));
-                comX = (int)un[0][0];
-                comY = (int)un[1][0];*/
-
-                comX = (int) (kre[0][0] * (c.getX() - m_x) - kre[0][1] * vX + kre[0][2] * (context.getMapHeight() - c.getY() - LASER_HEIGHT/2. - m_y) - kre[0][3] * vY);
-                comY = (int) (kre[1][0] * (c.getX() - m_x) - kre[1][1] * vX + kre[1][2] * (context.getMapHeight() - c.getY() - LASER_HEIGHT/2. - m_y) - kre[1][3] * vY);
-
-                Rectangle rect = new Rectangle(getX() - LASER_WIDTH / 2, getY(), LASER_WIDTH, LASER_HEIGHT);
-                if (rect.intersects(new Rectangle(c.getX() - context.getCowHitboxSize() / 2, c.getY() - context.getCowHitboxSize() / 2, context.getCowHitboxSize(), context.getCowHitboxSize()))) {
-                    laser = true;
+                if (fuelTank > 0) {
+                    comX = (int) (kre[0][0] * (c.getX() - m_x) - kre[0][1] * vX + kre[0][2] * (context.getMapHeight() - c.getY() + LASER_HEIGHT - 1 - m_y) - kre[0][3] * vY);
+                    comY = (int) (kre[1][0] * (c.getX() - m_x) - kre[1][1] * vX + kre[1][2] * (context.getMapHeight() - c.getY() + LASER_HEIGHT - 1 - m_y) - kre[1][3] * vY);
+                    // Disable the up engine
+                    if (comY <= 0) {
+                        comY = 0;
+                    }
+                    // Enable the other engines depending on comX and comY
+                    else {
+                        downEngine = true;
+                    }
+                    if (comX > 0) {
+                        leftEngine = true;
+                    } else if (comX < 0) {
+                        rightEngine = true;
+                    }
+                    if (m_y < context.getMapHeight() - c.getY() + LASER_HEIGHT) {
+                        laser = true;
+                    }
                 }
             } else {
-
                 if (fuelTank <= 0) {
-                    leftEngine = false;
-                    rightEngine = false;
-                    downEngine = false;
-                    laser = false;
+                    shutDownAll();
                 }
 
                 if (downEngine) {
                     comY += THRUST;
-                    fuelTank -= FUEL_CONSUMPTION;
                 }
                 if (leftEngine) {
                     comX += THRUST;
-                    fuelTank -= FUEL_CONSUMPTION;
                 }
                 if (rightEngine) {
                     comX -= THRUST;
-                    fuelTank -= FUEL_CONSUMPTION;
                 }
+            }
+
+            fuelTank -= FUEL_CONSUMPTION * Math.abs(comX / THRUST) + FUEL_CONSUMPTION * Math.abs(comY / THRUST);
+            if (laser) {
+                fuelTank -= FUEL_CONSUMPTION;
             }
 
             double erg = SPECIFIC_I / (MASS + FUEL_MASS * fuelTank);
@@ -143,13 +147,11 @@ public class Ufo extends Observable implements Runnable {
             taX = erg * comX;
             aY = taY - context.getG();
             aX = taX + context.getWindSpeed();
+            // Process (x;y)
             m_x = (m_x / GameEngine.PX_M_RATIO + dt * vX + (0.5) * dt * dt * aX) * GameEngine.PX_M_RATIO;
             m_y = (m_y / GameEngine.PX_M_RATIO + dt * vY + (0.5) * dt * dt * aY) * GameEngine.PX_M_RATIO;
             vX = vX + aX * dt;
             vY = vY + aY * dt;
-            if (laser) {
-                fuelTank -= FUEL_CONSUMPTION;
-            }
 
             if (getHeight() <= 0) {
                 m_y = context.getFloorHeight();
@@ -262,7 +264,7 @@ public class Ufo extends Observable implements Runnable {
     }
 
     public void setAuto(boolean b) {
-        auto = b;
         shutDownAll();
+        auto = b;
     }
 }

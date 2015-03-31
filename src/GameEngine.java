@@ -126,12 +126,8 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     /**
      * Restarts the game and launches the IA
      */
-    public void automatic() {
-        reset();
-        windSpeed = 0;
-        setChanged();
-        notifyObservers();
-        ufo.setAuto(true);
+    public void automatic(boolean b) {
+        ufo.setAuto(b);
     }
 
     /**
@@ -212,9 +208,9 @@ public class GameEngine extends Observable implements KeyListener, Observer {
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             ufo.setLaser(false);
         } else if (e.getKeyCode() == KeyEvent.VK_R) {
-            reset();
+            frame.getResetButton().doClick();
         } else if (e.getKeyCode() == KeyEvent.VK_A) {
-            automatic();
+            frame.getAutoButton().doClick();
         }
     }
 

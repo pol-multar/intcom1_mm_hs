@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +27,8 @@ public class CowCatcherFrame extends JFrame implements Observer {
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(); // The number format (for the height)
     private static final int ICON_SIZE = 60; // The size of the icons
 
+    private JButton resetButton;
+    private JToggleButton autoButton;
     private JLabel heightLabel;
     private JLabel speedLabel;
     private JLabel cowsLabel;
@@ -55,7 +59,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
         JPanel infoPane = new JPanel(new GridLayout(2, 4));
         infoPane.setBorder(BorderFactory.createLineBorder(Color.black));
         add(infoPane);
-        JButton resetButton = new JButton(RESET_BUTTON);
+        resetButton = new JButton(RESET_BUTTON);
         resetButton.setFocusable(false);
         infoPane.add(resetButton);
         heightLabel = new JLabel("", new ImageIcon(new ImageIcon(ICON_HEIGHT_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)), JLabel.LEFT);
@@ -64,7 +68,7 @@ public class CowCatcherFrame extends JFrame implements Observer {
         infoPane.add(speedLabel);
         cowsLabel = new JLabel("", new ImageIcon(new ImageIcon(ICON_COW_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)), JLabel.LEFT);
         infoPane.add(cowsLabel);
-        JButton autoButton = new JButton(AUTO_BUTTON);
+        autoButton = new JToggleButton(AUTO_BUTTON);
         autoButton.setFocusable(false);
         infoPane.add(autoButton);
         windLabel = new JLabel("", new ImageIcon(new ImageIcon(ICON_WIND_LEFT_PATH).getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH)), JLabel.LEFT);
@@ -106,10 +110,9 @@ public class CowCatcherFrame extends JFrame implements Observer {
                 engine.reset();
             }
         });
-        autoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                engine.automatic();
+        autoButton.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent ev) {
+                engine.automatic(((JToggleButton) ev.getSource()).isSelected());
             }
         });
 
@@ -173,5 +176,15 @@ public class CowCatcherFrame extends JFrame implements Observer {
         } else {
             fillEngineLabels();
         }
+    }
+
+    // Getters & setters
+
+    public JToggleButton getAutoButton(){
+        return autoButton;
+    }
+
+    public JButton getResetButton(){
+        return resetButton;
     }
 }
