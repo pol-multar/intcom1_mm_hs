@@ -2,7 +2,7 @@ package fr.unice.polytech.si4.intcomm.p2;
 
 /**
  * This class represents a projectile.
- * A projectile is a launched mobile at constant speed
+ * A projectile is a mobile launch at constant speed
  * on a constant path.
  *
  * @author mmultari
@@ -70,9 +70,9 @@ public class ProjectileMobile extends Mobile {
      */
     @Override
     public void computePath(int period) {
-        this.locations = new float[2][period];
+        this.locations = new float[2][period+1];
         //TODO period+1 ?
-        for (int i = 0; i < period; i++) {
+        for (int i = 0; i <= period; i++) {
             // x(t) = x0 + Vx * t
             locations[0][i] = m_x0 + m_vx * i;
             // y(t) = y0 + Vy * t
