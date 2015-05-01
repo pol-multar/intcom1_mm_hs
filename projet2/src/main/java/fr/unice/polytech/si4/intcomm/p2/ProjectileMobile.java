@@ -1,6 +1,10 @@
 package fr.unice.polytech.si4.intcomm.p2;
 
 /**
+ * This class represents a projectile.
+ * A projectile is a launched mobile at constant speed
+ * on a constant path.
+ *
  * @author mmultari
  * @version 01/05/2015
  */
@@ -15,7 +19,13 @@ public class ProjectileMobile extends Mobile {
     private float m_vx;
     private float m_vy;
 
-
+    /**
+     * Constructor with initial location
+     * @param x abscissa of the initial location
+     * @param y ordinate of the initial location
+     * @param vx x-relative speed
+     * @param vy y-relative speed
+     */
     public ProjectileMobile(float x, float y, float vx, float vy) {
 
         //location initialisation
@@ -27,6 +37,11 @@ public class ProjectileMobile extends Mobile {
         m_vy = vy;
     }
 
+    /**
+     * Default constructor with [0,0] for initial location
+     * @param vx x-relative speed
+     * @param vy y-relative speed
+     */
     public ProjectileMobile(float vx, float vy) {
         this(0, 0, vx, vy);
     }
