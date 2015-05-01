@@ -73,7 +73,10 @@ public abstract class Mobile {
         }
     }
 
+    /* This method depends of the mobile type */
     public abstract void computePath(int period);
+
+    /* This method depends of the mobile type */
     public abstract void computeNoisedPath(int period);
 
     public String toStringLocations() {
