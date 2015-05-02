@@ -8,27 +8,19 @@ public class App
 {
     public static void main( String[] args )
     {
-        //TODO renommer
         int maxPeriod=30;//Maximum period
 
         //Initialisation of the projectile
 
         String projFile = "projectile.txt";
+        String nprojFile = "nprojectile.txt";
         ProjectileMobile proj= new ProjectileMobile(2, 2, (float) 0.5, (float) 0.75);
         proj.computePath(maxPeriod);
-        proj.toFile(projFile,false);
+        proj.toFile(projFile, false);
+        ProjectileMobile proj2 = proj;
+        proj2.computeNoisedPath(maxPeriod);
+        proj2.toFile(nprojFile,true);
 
-        /*
-
-        String mobile = "Mobile.data";
-        String mobileBruit = "MobileAvecBruit.data";
-        ProjectileMobile m1 = new ProjectileMobile(2, 2, (float) 0.5, (float) 0.75);
-        ProjectileMobile m2 = new ProjectileMobile(2, 2, (float) 0.5, (float) 0.75);
-        m1.computePath(maxPeriod);
-        m1.toFile(mobile, false);
-        m2.computeNoisedPath(maxPeriod);
-        m2.toFile(mobileBruit, true);
-*/
         //initialisation of the observers
 
         String obsFile = "observer.txt";
@@ -43,7 +35,7 @@ public class App
 
         SimulatorEngine mySimu = new SimulatorEngine();
 
-        mySimu.simulate(proj,projFile,obs,noisedObs,obsFile,noisedObsFile);
+        mySimu.simulate(proj,projFile,nprojFile,obs,noisedObs,obsFile,noisedObsFile);
 
     }
 }
