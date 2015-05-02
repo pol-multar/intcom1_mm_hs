@@ -10,82 +10,59 @@ package fr.unice.polytech.si4.intcomm.p2;
  */
 public class ObserverMobile extends Mobile {
 
-    //The coordinate of the circle center of the observer
-    private float m_x;
-    private float m_y;
+    // The coordinate of the circle center of the observer
+    private float x;
+    private float y;
 
-    //The radius of the circle
-    private float m_r;
+    // The radius of the circle
+    private float r;
 
-    //Initial viewpoint
-    private float m_vp;
+    // Initial viewpoint
+    private float vp;
 
-    //Speed
-    private float m_sp;
+    // Speed
+    private float speed;
 
     /**
      * Constructor with all parameters available
      * @param initX abscissa of the initial location
      * @param initY ordinate of the initial location
-     * @param initRadius initial radius of the circle
-     * @param initSpeed the speed of the observer
      * @param initView initial viewpoint
-     */
-    public ObserverMobile(float initX, float initY, float initRadius, float initSpeed, float initView){
-        m_x=initX;
-        m_y=initY;
-        m_r =initRadius;
-        m_sp =initSpeed;
-        m_vp =initView;
-    }
-
-    /**
-     * Constructor without initial viewpoint
-     * @param initX abscissa of the initial location
-     * @param initY ordinate of the initial location
      * @param initRadius initial radius of the circle
      * @param initSpeed the speed of the observer
      */
-    public ObserverMobile(float initX, float initY, float initRadius, float initSpeed){
-        this(initX,initY,initRadius,initSpeed,0f);
-    }
-
-    /**
-     * Constructor with only radius and speed
-     * @param initRadius initial radius of the circle
-     * @param initSpeed the speed of the observer
-     */
-    public ObserverMobile(float initRadius,float initSpeed){
-        this(0,0,initRadius,initSpeed,0);
+    public ObserverMobile(float initX, float initY, float initView, float initRadius, float initSpeed){
+        this.x = initX;
+        this.y = initY;
+        this.r = initRadius;
+        this.vp = initView;
+        this.speed = initSpeed;
     }
 
     /**
      * Method in charge of the observer movement
      * @param period
      */
-    @Override
     public void computePath(int period) {
-        locations= new float[2][period+1];
-        for (int i = 0; i <= period ; i++) {
-            // x(t) = xc + radius * cos(v * t + phi)
-            locations[0][i]=(float) (m_x+m_r*Math.cos(m_sp*i+m_vp));
-            // y(t) = yc + radius * sin(v * t + phi)
-            locations[1][i]=(float) (m_y+m_r*Math.cos(m_sp*i+m_vp));
+        this.locations = new float[2][period +1];
+        for (int t = 0; t <= period; t++) {
+            // x(t) = xc + radius * cos(speed * t + phi)
+            this.locations[0][t] = (float) (this.x + this.r * Math.cos(this.speed * t + this.vp));
+            // y(t) = yc + radius * sin(speed * t + phi)
+            this.locations[1][t] = (float) (this.y + this.r * Math.sin(this.speed * t + this.vp));
         }
-
     }
 
     /**
      * Method in charge of the observer movement with noise
      * @param period
      */
-    @Override
     public void computeNoisedPath(int period) {
-        noisedLocations= new float[2][period+1];
-        for (int i = 0; i <=period ; i++) {
-            noisedLocations[0][i]=(float) (m_x+m_r*Math.cos(m_sp*i+m_vp))+ NOISE;
-            noisedLocations[1][i]=(float) (m_y+m_r*Math.cos(m_sp*i+m_vp))+ NOISE;
+        this.noisedLocations = new float[2][period + 1];
+        for (int i = 0; i <= period; i++) {
+            this.noisedLocations[0][i] = (float) (this.x + this.r * Math.cos(this.speed * i + this.vp)) + this.NOISE;
+            this.noisedLocations[1][i] = (float) (this.y + this.r * Math.sin(this.speed * i + this.vp)) + this.NOISE;
         }
-
     }
+
 }

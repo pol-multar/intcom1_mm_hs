@@ -23,77 +23,72 @@ public abstract class Mobile {
     protected float[][] noisedLocations;
 
     /* Noise computation constant */
-    protected static final float NOISE = (float)0.0001;
+    protected final float NOISE = (float) 0.0001;
 
 
-    public float[][] getLocations() {
-        return locations;
+    public float[][] getLocations(){
+        return this.locations;
     }
 
     public float[][] getNoisedLocations() {
-        return noisedLocations;
+        return this.noisedLocations;
     }
 
-    public static float getNOISE() {
+    public float getNOISE() {
         return NOISE;
     }
 
-    public float getXVector(int time) {
-        if (locations[0].length < time) {
-            return -1;//Index error
-        } else {
-            return locations[0][time];
+    public float getX(int time) {
+        if (this.locations[0].length < time) {
+            return -1;
         }
+        return this.locations[0][time];
     }
 
-    public float getYVector(int time) {
-        if (locations[1].length < time) {
-            return -1;//Index error
-        } else {
-            return locations[1][time];
+    public float getY(int time) {
+        if (this.locations[1].length < time) {
+            return -1;
         }
+        return this.locations[1][time];
     }
 
-    public float getNoisedXVector(int time) {
-        if (noisedLocations[0].length < time) {
-            return -1;//Index error
-        } else {
-            return noisedLocations[0][time];
+
+
+    public float getNoisedY(int t) {
+        if (this.noisedLocations[0].length < t) {
+            return -1;
         }
+        return this.noisedLocations[0][t];
     }
 
-    public float getNoisedYVector(int time) {
-        if (noisedLocations[1].length < time) {
-            return -1;//Index error
-        } else {
-            return noisedLocations[1][time];
+    public float getYBruit(int t) {
+        if (this.noisedLocations[1].length < t) {
+            return -1;
         }
+        return this.noisedLocations[1][t];
     }
 
     /* This method depends of the mobile type */
     public abstract void computePath(int period);
-
     /* This method depends of the mobile type */
     public abstract void computeNoisedPath(int period);
 
+
     public String toStringLocations() {
         String s = "";
-        for (int i = 0; i < locations.length; i++) {
-            s += locations[0][i] + " " + locations[1][i] + "\n";
+        // Affichage des locations
+        for (int i = 0; i < this.locations[0].length; i++) {
+            s += this.locations[0][i] + " " + this.locations[1][i] + "\n";
         }
         return s;
     }
 
-    public String toStringNoisedLocations() {
+    public String toStringBruit() {
         String s = "";
-        for (int i = 0; i < noisedLocations.length; i++) {
-            s += noisedLocations[0][i] + " " + noisedLocations[1][i] + "\n";
+        for (int i = 0; i < this.noisedLocations[0].length; i++) {
+            s += this.noisedLocations[0][i] + " " + this.noisedLocations[1][i] + "\n";
         }
         return s;
-    }
-
-    public String toString() {
-        return this.toStringLocations() + "\n" + this.toStringNoisedLocations();
     }
 
     /**
@@ -107,12 +102,8 @@ public abstract class Mobile {
         String filePath = System.getProperty("user.dir")+"/"+fileName;
         String allLocations;
 
-        if ( !noise ) {
-            allLocations = toStringLocations();
-        }
-        else{
-            allLocations = toStringNoisedLocations();
-        }
+        if ( !noise ) allLocations = toStringLocations();
+        else allLocations = toStringBruit();
 
         try {
             FileWriter fw = new FileWriter(filePath, false);
@@ -120,8 +111,9 @@ public abstract class Mobile {
             output.write(allLocations);
             output.flush();
             output.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
     }
+
 }

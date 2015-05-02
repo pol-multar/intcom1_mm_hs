@@ -11,13 +11,13 @@ package fr.unice.polytech.si4.intcomm.p2;
 public class ProjectileMobile extends Mobile {
 
     //Initial location
-    private float m_x0;
-    private float m_y0;
-
+    private float x0;
+    private float y0;
     //speeds of the projectile
     // -> have to be estimated by the observer
-    private float m_vx;
-    private float m_vy;
+    private float vx;
+    private float vy;
+
 
     /**
      * Constructor with initial location
@@ -26,44 +26,38 @@ public class ProjectileMobile extends Mobile {
      * @param vx x-relative speed
      * @param vy y-relative speed
      */
-    public ProjectileMobile(float x, float y, float vx, float vy) {
+    public ProjectileMobile(float x, float y, float vx, float vy){
 
         this.locations = new float[2][];
 
         //location initialisation
-        m_x0 = x;
-        m_y0 = y;
+        this.x0 = x;
+        this.y0 = y;
 
         //speed initialisation
-        m_vx = vx;
-        m_vy = vy;
+        this.vx = vx;
+        this.vy = vy;
+
     }
 
-    /**
-     * Default constructor with [0,0] for initial location
-     * @param vx x-relative speed
-     * @param vy y-relative speed
-     */
-    public ProjectileMobile(float vx, float vy) {
-        this(0, 0, vx, vy);
-        this.locations = new float[1][];
-    }
 
-    //Accessors
     public float getX0() {
-        return m_x0;
+        return this.x0;
     }
+
 
     public float getY0() {
-        return m_y0;
+        return this.y0;
     }
 
-    public float getVX() {
-        return m_vx;
+
+    public float getVx() {
+        return this.vx;
     }
 
-    public float getVY() {
-        return m_vy;
+
+    public float getVy() {
+        return this.vy;
     }
 
     /**
@@ -71,16 +65,14 @@ public class ProjectileMobile extends Mobile {
      *
      * @param period the maximum period
      */
-    @Override
     public void computePath(int period) {
-        this.locations = new float[2][period+1];
-        for (int i = 0; i <= period; i++) {
+        this.locations = new float[2][period +1];
+        for (int t = 0; t <= period; t++) {
             // x(t) = x0 + Vx * t
-            locations[0][i] = m_x0 + m_vx * i;
+            this.locations[0][t] = this.x0 + this.vx * t;
             // y(t) = y0 + Vy * t
-            locations[1][i] = m_y0 + m_vy * i;
+            this.locations[1][t] = this.y0 + this.vy * t;
         }
-
     }
 
     /**
@@ -88,8 +80,11 @@ public class ProjectileMobile extends Mobile {
      *
      * @param period the maximum period
      */
-    @Override
     public void computeNoisedPath(int period) {
-    //TODO to complete if usefull
+        noisedLocations = new float[2][period + 1];
+        for (int t = 0; t <= period; t++) {
+            noisedLocations[0][t] = this.x0 + this.vx * t;
+            noisedLocations[1][t] = this.y0 + this.vy * t;
+        }
     }
 }

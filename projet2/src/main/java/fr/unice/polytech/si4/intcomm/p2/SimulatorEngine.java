@@ -25,7 +25,7 @@ public class SimulatorEngine {
     private float getViewPointAngle(ProjectileMobile proj, ObserverMobile obs, int period) {
         if (period < proj.getLocations()[0].length) {
             if (period < obs.getLocations()[0].length) {
-                return (float) Math.atan2((obs.getYVector(period) - proj.getYVector(period)), (obs.getXVector(period) - proj.getXVector(period)));
+                return (float) Math.atan2((obs.getY(period) - proj.getY(period)), (obs.getX(period) - proj.getX(period)));
             }
         }
         return -100;
@@ -240,7 +240,7 @@ public class SimulatorEngine {
         Matrix noisedYMatrix = generateYMatrix(angles, obs2.getNoisedLocations());
 
         // Theoric matrix to find
-        Matrix projMatrix = new Matrix(new double[][]{{proj.getX0()}, {proj.getY0()}, {proj.getVX()}, {proj.getVY()}});
+        Matrix projMatrix = new Matrix(new double[][]{{proj.getX0()}, {proj.getY0()}, {proj.getVx()}, {proj.getVy()}});
 
         System.out.println("/***************************************************************************/");
         System.out.println("/************** least squares operation with inverse transform *************/");
