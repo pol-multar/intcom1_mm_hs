@@ -23,7 +23,7 @@ public abstract class Mobile {
     protected float[][] noisedLocations;
 
     /* Noise computation constant */
-    protected static final float NOISE = 0.001f;
+    protected static final float NOISE = (float)0.0001;
 
 
     public float[][] getLocations() {
@@ -42,7 +42,7 @@ public abstract class Mobile {
         if (locations[0].length < time) {
             return -1;//Index error
         } else {
-            return locations[1][time];
+            return locations[0][time];
         }
     }
 
@@ -58,7 +58,7 @@ public abstract class Mobile {
         if (noisedLocations[0].length < time) {
             return -1;//Index error
         } else {
-            return noisedLocations[1][time];
+            return noisedLocations[0][time];
         }
     }
 

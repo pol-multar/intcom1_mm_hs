@@ -28,7 +28,7 @@ public class SimulatorEngine {
                 return (float) Math.atan2((obs.getYVector(period) - proj.getYVector(period)), (obs.getXVector(period) - proj.getXVector(period)));
             }
         }
-        return -1000f;
+        return -100;
     }
 
     /**
@@ -145,9 +145,9 @@ public class SimulatorEngine {
      * @return
      */
     public Matrix inverseTrans(Matrix aMatrix, Matrix bMatrix) {
-        Matrix aTxa = (aMatrix.transpose()).times(aMatrix);//at*a
-        Matrix bTxb = (aMatrix.transpose()).times(bMatrix);//bt*b
-        return (aTxa.inverse()).times(bTxb);
+        Matrix aTxa = aMatrix.transpose().times(aMatrix);//at*a
+        Matrix bTxb = aMatrix.transpose().times(bMatrix);//bt*b
+        return aTxa.inverse().times(bTxb);
     }
 
     /**
@@ -230,7 +230,7 @@ public class SimulatorEngine {
         }
 
 
-        float[] angles = getAllViewPointAngles(proj, obs, 50);
+        float[] angles = getAllViewPointAngles(proj, obs, 30);
 
 
         Matrix cMatrix = generateCMatrix(angles);

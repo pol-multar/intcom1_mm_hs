@@ -28,6 +28,8 @@ public class ProjectileMobile extends Mobile {
      */
     public ProjectileMobile(float x, float y, float vx, float vy) {
 
+        this.locations = new float[2][];
+
         //location initialisation
         m_x0 = x;
         m_y0 = y;
@@ -44,6 +46,7 @@ public class ProjectileMobile extends Mobile {
      */
     public ProjectileMobile(float vx, float vy) {
         this(0, 0, vx, vy);
+        this.locations = new float[1][];
     }
 
     //Accessors
@@ -71,7 +74,6 @@ public class ProjectileMobile extends Mobile {
     @Override
     public void computePath(int period) {
         this.locations = new float[2][period+1];
-        //TODO period+1 ?
         for (int i = 0; i <= period; i++) {
             // x(t) = x0 + Vx * t
             locations[0][i] = m_x0 + m_vx * i;

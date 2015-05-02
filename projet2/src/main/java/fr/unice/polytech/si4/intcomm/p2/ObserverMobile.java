@@ -33,7 +33,7 @@ public class ObserverMobile extends Mobile {
      */
     public ObserverMobile(float initX, float initY, float initRadius, float initSpeed, float initView){
         m_x=initX;
-        m_y=initX;
+        m_y=initY;
         m_r =initRadius;
         m_sp =initSpeed;
         m_vp =initView;
