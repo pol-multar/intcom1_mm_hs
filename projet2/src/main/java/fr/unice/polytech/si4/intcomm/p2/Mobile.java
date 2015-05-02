@@ -1,8 +1,5 @@
 package fr.unice.polytech.si4.intcomm.p2;
 
-import org.jblas.DoubleMatrix;
-import org.jblas.FloatMatrix;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
