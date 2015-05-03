@@ -37,5 +37,6 @@ public class App
 
         mySimu.simulate(proj,projFile,nprojFile,obs,noisedObs,obsFile,noisedObsFile);
 
+        new AppView(proj, obs).run();
     }
 }
