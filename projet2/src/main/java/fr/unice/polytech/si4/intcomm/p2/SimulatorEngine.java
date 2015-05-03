@@ -12,6 +12,11 @@ import java.io.*;
 public class SimulatorEngine {
 
     /**
+     * The number of the period simulation
+     */
+    public static final int MAXPERIOD=30;
+
+    /**
      * Calculates viewpoint angles between a projectile and an observer at one period
      *
      * @param proj   the projectile
@@ -23,7 +28,7 @@ public class SimulatorEngine {
         if (period < proj.getLocations()[0].length) {
             if (period < obs.getLocations()[0].length) {
                 // o.y - p.y , o.x - p.x
-                return (float) Math.atan2((obs.getY(period) - proj.getY(period)), (obs.getX(period) - proj.getX(period)));
+                return (float) Math.atan2((obs.getYat(period) - proj.getYat(period)), (obs.getXat(period) - proj.getXat(period)));
             }
         }//If index error
         return -100;

@@ -21,12 +21,13 @@ public class ProjectileMobile extends Mobile {
 
     /**
      * Constructor with initial location
-     * @param x abscissa of the initial location
-     * @param y ordinate of the initial location
+     *
+     * @param x  abscissa of the initial location
+     * @param y  ordinate of the initial location
      * @param vx x-relative speed
      * @param vy y-relative speed
      */
-    public ProjectileMobile(float x, float y, float vx, float vy){
+    public ProjectileMobile(float x, float y, float vx, float vy) {
 
         this.locations = new float[2][];
 
@@ -66,7 +67,7 @@ public class ProjectileMobile extends Mobile {
      * @param period the maximum period
      */
     public void computePath(int period) {
-        this.locations = new float[2][period +1];
+        this.locations = new float[2][period + 1];
         for (int t = 0; t <= period; t++) {
             // x(t) = x0 + Vx * t
             this.locations[0][t] = this.x0 + this.vx * t;
@@ -86,5 +87,10 @@ public class ProjectileMobile extends Mobile {
             noisedLocations[0][t] = this.x0 + this.vx * t;
             noisedLocations[1][t] = this.y0 + this.vy * t;
         }
+    }
+
+    public void updateTrajectory(int period) {
+        m_x = this.x0 + this.vx * period;
+        m_y = this.y0 + this.vy * period;
     }
 }

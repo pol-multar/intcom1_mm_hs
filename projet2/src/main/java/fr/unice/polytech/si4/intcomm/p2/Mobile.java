@@ -12,6 +12,10 @@ import java.io.IOException;
  */
 public abstract class Mobile {
 
+    //The initial location of the mobile
+    protected float m_x;
+    protected float m_y;
+
     /**
      * Matrix containing mobile locations as a function of time t
      * [0][t] contains x(t) vector
@@ -38,14 +42,22 @@ public abstract class Mobile {
         return NOISE;
     }
 
-    public float getX(int time) {
+    public float getM_x() {
+        return m_x;
+    }
+
+    public float getM_y() {
+        return m_y;
+    }
+
+    public float getXat(int time) {
         if (this.locations[0].length < time) {
             return -1;
         }
         return this.locations[0][time];
     }
 
-    public float getY(int time) {
+    public float getYat(int time) {
         if (this.locations[1].length < time) {
             return -1;
         }
@@ -72,6 +84,8 @@ public abstract class Mobile {
     public abstract void computePath(int period);
     /* This method depends of the mobile type */
     public abstract void computeNoisedPath(int period);
+
+    public abstract void updateTrajectory(int period);
 
 
     public String toStringLocations() {
