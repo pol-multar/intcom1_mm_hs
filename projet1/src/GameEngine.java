@@ -262,8 +262,4 @@ public class GameEngine extends Observable implements KeyListener, Observer {
     public int getFloorHeight() {
         return FLOOR_HEIGHT;
     }
-
-    public static int getCowHitboxSize() {
-        return COW_HITBOX_SIZE;
-    }
 }
