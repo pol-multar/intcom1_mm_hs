@@ -30,7 +30,7 @@ public class AppView extends JFrame implements Runnable{
         this.observer = observer;
 
         JLayeredPane layeredPane = new JLayeredPane();
-        graphPane = new GraphPanel(new Point((int)(scale*projectile.getX0()), (int)(scale*projectile.getY0())), new Point((int)(scale*observer.getX(0)), (int)(scale*observer.getY(0))));
+        graphPane = new GraphPanel(new Point((int)(scale*projectile.getX0()), (int)(scale*projectile.getY0())), new Point((int)(scale*observer.getXat(0)), (int)(scale*observer.getYat(0))));
         JPanel background = new JPanel(new GridLayout(2,2));
         JPanel pane1 = new JPanel();
         pane1.setBackground(Color.WHITE);
@@ -61,7 +61,7 @@ public class AppView extends JFrame implements Runnable{
         JPanel locationPane = new JPanel(new GridLayout(2,2));
         JLabel obsLabel = new JLabel("Observateur");
         obsLabel.setForeground(Color.BLUE);
-        obsLocationLabel = new JLabel(observer.getX(0)+" ; "+observer.getY(0));
+        obsLocationLabel = new JLabel(observer.getXat(0)+" ; "+observer.getYat(0));
         JLabel projLabel = new JLabel("Projectile");
         projLabel.setForeground(Color.RED);
         projLocationLabel = new JLabel(projectile.getX0()+" ; "+projectile.getY0());
@@ -90,10 +90,10 @@ public class AppView extends JFrame implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            obsLocationLabel.setText(observer.getX(i)+" ; "+observer.getY(i));
-            projLocationLabel.setText(projectile.getX(i)+" ; "+projectile.getY(i));
-            graphPane.setObserverLocation((int)(scale*observer.getX(i)), (int)(scale*observer.getY(i)));
-            graphPane.setProjectileLocation((int)(scale*projectile.getX(i)), (int)(scale*projectile.getY(i)));
+            obsLocationLabel.setText(observer.getXat(i)+" ; "+observer.getYat(i));
+            projLocationLabel.setText(projectile.getXat(i)+" ; "+projectile.getYat(i));
+            graphPane.setObserverLocation((int)(scale*observer.getXat(i)), (int)(scale*observer.getYat(i)));
+            graphPane.setProjectileLocation((int)(scale*projectile.getXat(i)), (int)(scale*projectile.getYat(i)));
         }
     }
 }
