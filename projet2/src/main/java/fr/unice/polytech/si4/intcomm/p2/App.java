@@ -8,17 +8,19 @@ public class App
 {
     public static void main( String[] args )
     {
-        int maxPeriod=30;//Maximum period
+
+
+        SimulatorEngine mySimu = new SimulatorEngine();
 
         //Initialisation of the projectile
 
         String projFile = "projectile.txt";
         String nprojFile = "nprojectile.txt";
         ProjectileMobile proj= new ProjectileMobile(2, 2, (float) 0.5, (float) 0.75);
-        proj.computePath(maxPeriod);
+        proj.computePath(SimulatorEngine.MAXPERIOD);
         proj.toFile(projFile, false);
         ProjectileMobile proj2 = proj;
-        proj2.computeNoisedPath(maxPeriod);
+        proj2.computeNoisedPath(SimulatorEngine.MAXPERIOD);
         proj2.toFile(nprojFile,true);
 
         //initialisation of the observers
@@ -28,12 +30,10 @@ public class App
 
         ObserverMobile obs = new ObserverMobile(10, 10, 10, (float) (Math.PI)*8, 1);
         ObserverMobile noisedObs = new ObserverMobile(10, 10, 10, (float) (Math.PI)*8, 1);
-        obs.computePath(maxPeriod);
+        obs.computePath(SimulatorEngine.MAXPERIOD);
         obs.toFile(obsFile, false);
-        noisedObs.computeNoisedPath(maxPeriod);
+        noisedObs.computeNoisedPath(SimulatorEngine.MAXPERIOD);
         noisedObs.toFile(noisedObsFile, true);
-
-        SimulatorEngine mySimu = new SimulatorEngine();
 
         mySimu.simulate(proj,projFile,nprojFile,obs,noisedObs,obsFile,noisedObsFile);
 
