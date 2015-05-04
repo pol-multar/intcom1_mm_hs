@@ -67,8 +67,8 @@ public class ProjectileMobile extends Mobile {
      * @param period the maximum period
      */
     public void computePath(int period) {
-        this.locations = new float[2][period + 1];
-        for (int t = 0; t <= period; t++) {
+        this.locations = new float[2][period];
+        for (int t = 0; t < period; t++) {
             // x(t) = x0 + Vx * t
             this.locations[0][t] = this.x0 + this.vx * t;
             // y(t) = y0 + Vy * t
@@ -82,8 +82,8 @@ public class ProjectileMobile extends Mobile {
      * @param period the maximum period
      */
     public void computeNoisedPath(int period) {
-        noisedLocations = new float[2][period + 1];
-        for (int t = 0; t <= period; t++) {
+        noisedLocations = new float[2][period];
+        for (int t = 0; t < period; t++) {
             noisedLocations[0][t] = this.x0 + this.vx * t;
             noisedLocations[1][t] = this.y0 + this.vy * t;
         }

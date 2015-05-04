@@ -60,8 +60,8 @@ public class ObserverMobile extends Mobile {
      * @param maxPeriod
      */
     public void computePath(int maxPeriod) {
-        this.locations = new float[2][maxPeriod + 1];
-        for (int t = 0; t <= maxPeriod; t++) {
+        this.locations = new float[2][maxPeriod];
+        for (int t = 0; t < maxPeriod; t++) {
             // x(t) = xc + radius * cos(speed * t + phi)
             this.locations[0][t] = (float) (this.cx + this.r * Math.cos(this.speed * t + this.vp));
             // y(t) = yc + radius * sin(speed * t + phi)
@@ -75,10 +75,10 @@ public class ObserverMobile extends Mobile {
      * @param maxPeriod
      */
     public void computeNoisedPath(int maxPeriod) {
-        this.noisedLocations = new float[2][maxPeriod + 1];
-        for (int t = 0; t <= maxPeriod; t++) {
-            this.noisedLocations[0][t] = (float) (this.cx + this.r * Math.cos(this.speed * t + this.vp)) + this.NOISE;
-            this.noisedLocations[1][t] = (float) (this.cy + this.r * Math.sin(this.speed * t + this.vp)) + this.NOISE;
+        this.noisedLocations = new float[2][maxPeriod];
+        for (int t = 0; t < maxPeriod; t++) {
+            this.noisedLocations[0][t] = (float) (this.cx + this.r * Math.cos(this.speed * t + this.vp)) + SimulatorEngine.NOISE;
+            this.noisedLocations[1][t] = (float) (this.cy + this.r * Math.sin(this.speed * t + this.vp)) + SimulatorEngine.NOISE;
         }
     }
 

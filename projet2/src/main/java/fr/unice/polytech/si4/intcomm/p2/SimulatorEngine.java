@@ -16,6 +16,17 @@ public class SimulatorEngine {
      */
     public static final int MAXPERIOD=30;
 
+    /* Noise computation constant */
+    public static final float NOISE = (float) 0.0001;
+
+    private float [] angles;
+
+    public SimulatorEngine(){
+        angles = new float[MAXPERIOD];
+    }
+
+
+
     /**
      * Calculates viewpoint angles between a projectile and an observer at one period
      *
@@ -43,11 +54,21 @@ public class SimulatorEngine {
      * @return
      */
     public float[] getAllViewPointAngles(ProjectileMobile proj, ObserverMobile obs, int maxPeriod) {
-        float[] allViewPointAngles = new float[maxPeriod + 1];
-        for (int i = 0; i <= maxPeriod; i++) {
+        float[] allViewPointAngles = new float[maxPeriod];
+        for (int i = 0; i < maxPeriod; i++) {
             allViewPointAngles[i] = getViewPointAngle(proj, obs, i);
         }
         return allViewPointAngles;
+    }
+
+
+    public void testAngles(ProjectileMobile proj, ObserverMobile obs, int maxPeriod) {
+        System.out.println("Angle mesure avec un bruit = "+NOISE+"\n");
+        float[] angles=getAllViewPointAngles(proj,obs,maxPeriod);
+        for (int i = 0; i < maxPeriod ; i++) {
+            System.out.println("Angle a l etape "+i+" = "+ angles[i]);
+            System.out.println("===================================");
+        }
     }
 
     /**
@@ -178,7 +199,7 @@ public class SimulatorEngine {
             // Bring up to date the solution
             result.plusEquals(kMatrix.times(predictionError));
 
-            // Brinf up to date pMatrix with matrix inversion lemma
+            // Bring up to date pMatrix with matrix inversion lemma
             pMatrix.minusEquals(kMatrix.times(cBis.transpose()).times(pMatrix));
         }
         return result;
@@ -216,13 +237,14 @@ public class SimulatorEngine {
     public void simulate(ProjectileMobile proj, String mobileFile, String mobileBruitFile,
                          ObserverMobile o, ObserverMobile o2, String obsFile, String obsBruitFile){
 
+        /*
         try {
             mergeFiles("simulation.txt", mobileFile, obsFile);
             mergeFiles("noisedSimulation.txt", mobileBruitFile, obsBruitFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+*/
 
         float[] angles = getAllViewPointAngles(proj, o, 30);
 

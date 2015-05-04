@@ -26,8 +26,7 @@ public abstract class Mobile {
     /* The same matrix with computation noise */
     protected float[][] noisedLocations;
 
-    /* Noise computation constant */
-    protected final float NOISE = (float) 0.0001;
+
 
 
     public float[][] getLocations(){
@@ -38,9 +37,6 @@ public abstract class Mobile {
         return this.noisedLocations;
     }
 
-    public float getNOISE() {
-        return NOISE;
-    }
 
     public float getM_x() {
         return m_x;

@@ -35,6 +35,8 @@ public class App
         noisedObs.computeNoisedPath(SimulatorEngine.MAXPERIOD);
         noisedObs.toFile(noisedObsFile, true);
 
+        mySimu.testAngles(proj,obs,SimulatorEngine.MAXPERIOD);
+
         mySimu.simulate(proj,projFile,nprojFile,obs,noisedObs,obsFile,noisedObsFile);
 
         new AppView(proj, obs).run();
