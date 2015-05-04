@@ -19,13 +19,15 @@ public class SimulatorEngine {
     /* Noise computation constant */
     public static final float NOISE = (float) 0.0001;
 
-    private float [] angles;
+    private float [] anglesFound;
 
     public SimulatorEngine(){
-        angles = new float[MAXPERIOD];
+        anglesFound = new float[MAXPERIOD];
     }
 
-
+    public float[] getAnglesFound() {
+        return anglesFound;
+    }
 
     /**
      * Calculates viewpoint angles between a projectile and an observer at one period
@@ -63,11 +65,24 @@ public class SimulatorEngine {
 
 
     public void testAngles(ProjectileMobile proj, ObserverMobile obs, int maxPeriod) {
-        System.out.println("Angle mesure avec un bruit = "+NOISE+"\n");
         float[] angles=getAllViewPointAngles(proj,obs,maxPeriod);
-        for (int i = 0; i < maxPeriod ; i++) {
-            System.out.println("Angle a l etape "+i+" = "+ angles[i]);
+        //float theta,xProjOrig,yProjOrig,xObs,yObs,xVProj,yVProj;
+        float theta,xp,yp,xo,yo,vx,vy;
+        double result;
+        for (int t = 0; t < maxPeriod ; t++) {
+            theta=angles[t]+NOISE;
+            System.out.println("Theta bruite = "+theta +" mesure avec un bruit = "+NOISE+"\n");
+            xo=proj.getX0();
+            yo=proj.getY0();
+            xp=obs.getXat(t);
+            yp=obs.getYat(t);
+            vx=proj.getVx();
+            vy=proj.getVy();
+            result=yp * Math.cos(theta) - xp * Math.sin(theta) - yo * Math.cos(theta) + xo * Math.sin(theta) - vy * Math.cos(theta) * t
+                    + vx * Math.sin(theta) * t;
+            System.out.println("Angle a l etape "+t+" = "+ result);
             System.out.println("===================================");
+            this.anglesFound[t]=(float)result;
         }
     }
 
