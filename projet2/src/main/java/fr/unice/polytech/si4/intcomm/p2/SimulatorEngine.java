@@ -202,10 +202,10 @@ public class SimulatorEngine {
         Matrix pMatrix = new Matrix(4, 4);//4 rows 4 col
 
         for (int i = 0; i < 4; i++)
-            pMatrix.set(i, i, 100000);  //10000 0 0 0
-                                        //0 1000 0 0
-                                        //0 0 1000 0
-                                        //0 0 0 10000
+            pMatrix.set(i, i, 100000);  //100000 0 0 0
+                                        //0 100000 0 0
+                                        //0 0 100000 0
+                                        //0 0 0 100000
 
         for (int i = 0; i < t; i++) {
 
