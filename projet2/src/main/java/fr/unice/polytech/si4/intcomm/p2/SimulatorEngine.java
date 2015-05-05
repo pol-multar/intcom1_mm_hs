@@ -63,24 +63,29 @@ public class SimulatorEngine {
         return allViewPointAngles;
     }
 
-
+    /**
+     * Methode de test des angles
+     * @param proj
+     * @param obs
+     * @param maxPeriod
+     */
     public void testAngles(ProjectileMobile proj, ObserverMobile obs, int maxPeriod) {
         float[] angles=getAllViewPointAngles(proj,obs,maxPeriod);
         //float theta,xProjOrig,yProjOrig,xObs,yObs,xVProj,yVProj;
-        float theta,xp,yp,xo,yo,vx,vy;
+        float theta,xObs,yObs,xProjOrig,yProjOrig,xVProj,yVProj;
         double result;
         for (int t = 0; t < maxPeriod ; t++) {
             theta=angles[t]+NOISE;
             System.out.println("Theta bruite = "+theta +" mesure avec un bruit = "+NOISE+"\n");
-            xo=proj.getX0();
-            yo=proj.getY0();
-            xp=obs.getXat(t);
-            yp=obs.getYat(t);
-            vx=proj.getVx();
-            vy=proj.getVy();
-            result=yp * Math.cos(theta) - xp * Math.sin(theta) - yo * Math.cos(theta) + xo * Math.sin(theta) - vy * Math.cos(theta) * t
-                    + vx * Math.sin(theta) * t;
-            System.out.println("Angle a l etape "+t+" = "+ result);
+            xProjOrig=proj.getX0();
+            yProjOrig=proj.getY0();
+            xObs=obs.getXat(t);
+            yObs=obs.getYat(t);
+            xVProj=proj.getVx();
+            yVProj=proj.getVy();
+            result=yObs * Math.cos(theta) - xObs * Math.sin(theta) - yProjOrig * Math.cos(theta) + xProjOrig * Math.sin(theta) - yVProj * Math.cos(theta) * t
+                    + xVProj * Math.sin(theta) * t;//This result is 0 when measures are perfect
+            System.out.println("Erreur de l angle a l etape "+t+" = "+ result);
             System.out.println("===================================");
             this.anglesFound[t]=(float)result;
         }
@@ -88,7 +93,8 @@ public class SimulatorEngine {
 
     /**
      * Calculates C matrix with the method of least squares
-     *
+     * C[angles Number, 4]
+     * [sin(angle),-cos(angle),t*sin(angle),-t*cos(angle)]
      * @param angles
      * @return Matrix
      */
@@ -109,7 +115,8 @@ public class SimulatorEngine {
      *
      * @param angles    the angles viewpoint
      * @param locations the locations of the observer
-     * @return Matrix
+     * @return Matrix contain for each angles
+     * the difference between xLocationAtT*sin(angles[T]) - yLocationAtT*cos(angles[T])
      */
     public Matrix generateYMatrix(float[] angles, float[][] locations) {
         Matrix yMatrix = new Matrix(angles.length, 1);
@@ -175,8 +182,8 @@ public class SimulatorEngine {
      */
     public Matrix inverseTrans(Matrix aMatrix, Matrix bMatrix) {
         Matrix ctA = aMatrix.transpose().times(aMatrix);//At*A
-        Matrix ctB = aMatrix.transpose().times(bMatrix);
-        Matrix result = ctA.inverse().times(ctB);
+        Matrix ctB = aMatrix.transpose().times(bMatrix);//Bt*B
+        Matrix result = ctA.inverse().times(ctB);//ctA-1*ctB
         return result;
     }
 
@@ -190,31 +197,34 @@ public class SimulatorEngine {
      */
     public Matrix recursiveUpdate(Integer t, Matrix cMatrix, Matrix yMatrix) {
 
-        Matrix result = new Matrix(4, 1);
-        Matrix cBis = new Matrix(4, 1);
-        Matrix pMatrix = new Matrix(4, 4);
+        Matrix result = new Matrix(4, 1);//4 rows 1 col
+        Matrix cBis = new Matrix(4, 1);//4 rows 1 col
+        Matrix pMatrix = new Matrix(4, 4);//4 rows 4 col
 
         for (int i = 0; i < 4; i++)
-            pMatrix.set(i, i, 100000);
+            pMatrix.set(i, i, 100000);  //10000 0 0 0
+                                        //0 1000 0 0
+                                        //0 0 1000 0
+                                        //0 0 0 10000
 
         for (int i = 0; i < t; i++) {
+
             cBis.set(0, 0, cMatrix.get(i, 0));
             cBis.set(1, 0, cMatrix.get(i, 1));
             cBis.set(2, 0, cMatrix.get(i, 2));
             cBis.set(3, 0, cMatrix.get(i, 3));
 
-            // Compute prediction error
-            double predictionError = yMatrix.get(i,0) - ((cBis.transpose()).times(result)).get(0,0);
+            //Step 1 : Compute prediction error eps(T)=y(t)-cTrans.x(t)
+            double epsilon = yMatrix.get(i,0) - ((cBis.transpose()).times(result)).get(0,0);
 
-            // Compute saving correction
+            //Step 2 : Compute saving correction k(t)=P(t)*c(T).(I+cTrans(t).P(T).c(T))^-1
             double tmp = (cBis.transpose().times(pMatrix).times(cBis)).get(0,0);
-
             Matrix kMatrix = pMatrix.times(cBis).times((1 / (tmp + 1)));
 
-            // Bring up to date the solution
-            result.plusEquals(kMatrix.times(predictionError));
+            //Step 3 : Bring up to date the solution x(t+1)=x(t)+k(t).eps(T)
+            result.plusEquals(kMatrix.times(epsilon));
 
-            // Bring up to date pMatrix with matrix inversion lemma
+            //Step 4 : Bring up to date pMatrix with matrix inversion lemma P(T+1)=P(T)-k(T).cTrans(T).P(t)
             pMatrix.minusEquals(kMatrix.times(cBis.transpose()).times(pMatrix));
         }
         return result;
